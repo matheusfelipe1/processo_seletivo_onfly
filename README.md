@@ -21,3 +21,14 @@
 - The folder called **core** is where localized our business rules, there was our internal database, values objects (rich entities), contracts, events class, etc.
 - The folder called **shared** is where our components are located and any location in the application can access the resources shared there, examples: Endpoints class, Utils class, File for extensions, Animations class, etc.
 - In my applications. I have a habit of using abstract classes in any class that I consider to be of greater importance.
+
+- **Details**:
+- The folder widgets is folder that contains our custom widgets
+- The folder extensions is folder that contains our extensions created.
+- The folder routes is folder that contains our routes in the app.
+- The folder static is folder that contains our static class.
+- The folder utils is folder that contains our feedbacks actions.
+- The contracts folder is the folder that contains our abstract classes from the repositories
+- The implementations folder is the folder that contains our classes that extends abstract classes from repositories.
+- The middleware folder is the folder that contains our DIO setup for services, is there that we do interceptors.
+- The events folder is the folder that contains our events mapped in the app, for any action that MVVM dispatch and execute some business rule.
