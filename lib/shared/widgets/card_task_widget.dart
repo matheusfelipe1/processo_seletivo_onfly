@@ -64,7 +64,7 @@ class _CardTaskWidgetState extends State<CardTaskWidget> {
     }
   }
 
-  final numberFormat = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+  final numberFormat = NumberFormat.currency(locale: 'en_US', symbol: '\$ ');
   final dateFormat = DateFormat("HH:mm 'h'");
   String showDate = '';
   @override

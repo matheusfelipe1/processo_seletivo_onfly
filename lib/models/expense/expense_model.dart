@@ -41,5 +41,6 @@ class ExpenseModel {
         longitude: json['longitude'],
         updated: json['updated'],
         notSynchronized: json['notSynchronized'],
+        typeCard: json['typeCard'] ?? TypeCardEnum.task,
       );
 }

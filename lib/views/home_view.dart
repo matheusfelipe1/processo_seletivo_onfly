@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/get_core.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:processo_seletivo_onfly/shared/enum/card_enum.dart';
 import 'package:processo_seletivo_onfly/shared/enum/states_enum.dart';
 import 'package:processo_seletivo_onfly/shared/routes/app_paths.dart';
 import 'package:processo_seletivo_onfly/shared/static/app_colors.dart';
@@ -92,11 +93,19 @@ class _HomeViewState extends State<HomeView> {
                             itemBuilder: (_, index) =>
                                 listForAnimations[index]);
                       case StateScreen.hasData:
-                        return ListView.builder(
+                        return  ListView.builder(
                             physics: const BouncingScrollPhysics(),
                             itemCount: controller.expensesList.length,
                             itemBuilder: (_, index) =>
-                                CardTaskWidget(expense: controller.expensesList[index],));
+                              (() {
+                                switch (controller.expensesList[index].typeCard) {
+                                  case TypeCardEnum.date:
+                                    return CardDateTime(size: size, date: controller.expensesList[index].expenseDate ?? '');
+                                  default:
+                                    return CardTaskWidget(expense: controller.expensesList[index],);
+                                }
+                              }()));
+                                
                       default:
                         return Center(
                           child: Text(

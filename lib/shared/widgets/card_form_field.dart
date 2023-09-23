@@ -16,7 +16,9 @@ class CardFormField extends StatefulWidget {
       required this.title,
       this.onComplete,
       this.mask,
-      this.format, this.icon, required this.hint});
+      this.format,
+      this.icon,
+      required this.hint});
 
   @override
   State<CardFormField> createState() => _CardFormFieldState();
@@ -29,13 +31,13 @@ class _CardFormFieldState extends State<CardFormField> {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: size.width * .05, vertical: size.width * .05),
-      child: Container(
+      child: SizedBox(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               widget.title,
-              style: TextStyle(
+              style: const TextStyle(
                   fontFamily: 'Poppins-Bold',
                   color: Color.fromARGB(255, 131, 131, 131)),
             ),
@@ -48,7 +50,7 @@ class _CardFormFieldState extends State<CardFormField> {
               onTapOutside: (val) => FocusScope.of(context).unfocus(),
               onFieldSubmitted: (val) => FocusScope.of(context).nextFocus(),
               decoration: InputDecoration(
-                suffixIcon: widget.icon,
+                  suffixIcon: widget.icon,
                   hintText: widget.hint,
                   disabledBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey)),
@@ -61,4 +63,3 @@ class _CardFormFieldState extends State<CardFormField> {
     );
   }
 }
-
