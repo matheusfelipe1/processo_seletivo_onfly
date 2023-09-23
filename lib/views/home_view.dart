@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/get_core.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:processo_seletivo_onfly/shared/routes/app_paths.dart';
 import 'package:processo_seletivo_onfly/shared/static/app_colors.dart';
 import 'package:processo_seletivo_onfly/shared/widgets/card_task_widget.dart';
 import 'package:processo_seletivo_onfly/shared/widgets/custom_base_widget.dart';
@@ -69,6 +72,16 @@ class _HomeViewState extends State<HomeView> {
             CardTaskWidget(),
             CardTaskWidget(),
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.blue,
+          onPressed: () {
+            Get.toNamed(AppPaths.details);
+          },
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
         ),
       ),
     );
