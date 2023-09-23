@@ -6,11 +6,13 @@ import '../static/app_colors.dart';
 
 class CardDateField extends StatefulWidget {
   final String title;
+  final TextEditingController controller;
   final Function(String)? onComplete;
   const CardDateField({
     super.key,
     required this.title,
     this.onComplete,
+    required this.controller,
   });
 
   @override
@@ -35,29 +37,37 @@ class _CardDateFieldState extends State<CardDateField> {
                   color: Color.fromARGB(255, 131, 131, 131)),
             ),
             InkWell(
-              onTap: () => showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2019),
-                  lastDate: DateTime(2026)),
-              child: TextFormField(
-                onFieldSubmitted: (val) => FocusScope.of(context).nextFocus(),
-                keyboardType: TextInputType.datetime,
-                enabled: false,
-                onTap: () => showDatePicker(
+              onTap: () async {
+                final date = await showDatePicker(
                     context: context,
                     initialDate: DateTime.now(),
                     firstDate: DateTime(2019),
-                    lastDate: DateTime(2026)),
-                onChanged: (text) => widget.onComplete?.call(text),
-                onTapOutside: (val) => FocusScope.of(context).unfocus(),
-                decoration: InputDecoration(
-                  suffixIcon: const Icon(Icons.calendar_today),
-                    hintText: 'yyyy/mm/dd',
-                    disabledBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey)),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.blue))),
+                    lastDate: DateTime(2026));
+                if (date != null) {
+                  widget.onComplete?.call(date.toIso8601String());
+                }
+              },
+              child: IgnorePointer(
+                ignoring: true,
+                child: TextFormField(
+                  onFieldSubmitted: (val) => FocusScope.of(context).nextFocus(),
+                  keyboardType: TextInputType.datetime,
+                  onTap: () => showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2019),
+                      lastDate: DateTime(2026)),
+                  onChanged: (text) => widget.onComplete?.call(text),
+                  onTapOutside: (val) => FocusScope.of(context).unfocus(),
+                  controller: widget.controller,
+                  decoration: InputDecoration(
+                      suffixIcon: const Icon(Icons.calendar_today),
+                      hintText: 'yyyy/mm/dd',
+                      disabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey)),
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.blue))),
+                ),
               ),
             )
           ],

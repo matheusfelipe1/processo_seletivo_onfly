@@ -109,9 +109,17 @@ class _HomeViewState extends State<HomeView> {
                                                   .expenseDate ??
                                               '');
                                     default:
-                                      return CardTaskWidget(
-                                        expense: controller.expensesList[index],
-                                        onDelete: (id) => controller.delete(id),
+                                      return InkWell(
+                                        onTap: () => Get.toNamed(
+                                            AppPaths.details,
+                                            arguments: controller
+                                                .expensesList[index].id),
+                                        child: CardTaskWidget(
+                                          expense:
+                                              controller.expensesList[index],
+                                          onDelete: (id) =>
+                                              controller.delete(id),
+                                        ),
                                       );
                                   }
                                 }()));

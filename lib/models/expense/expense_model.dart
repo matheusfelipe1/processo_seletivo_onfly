@@ -14,23 +14,22 @@ class ExpenseModel {
   bool? notSynchronized;
   TypeCardEnum? typeCard;
 
-  ExpenseModel({
-    this.amount,
-    this.collectionId,
-    this.collectionName,
-    this.created,
-    this.description,
-    this.expenseDate,
-    this.id,
-    this.latitude,
-    this.longitude,
-    this.updated,
-    this.notSynchronized,
-    this.typeCard
-  });
+  ExpenseModel(
+      {this.amount,
+      this.collectionId,
+      this.collectionName,
+      this.created,
+      this.description,
+      this.expenseDate,
+      this.id,
+      this.latitude,
+      this.longitude,
+      this.updated,
+      this.notSynchronized,
+      this.typeCard});
 
   factory ExpenseModel.fromJSON(Map<String, dynamic> json) => ExpenseModel(
-        amount: json['amount'],
+        amount: json['amount'].toDouble(),
         collectionId: json['collectionId'],
         collectionName: json['collectionName'],
         created: json['created'],
@@ -43,4 +42,11 @@ class ExpenseModel {
         notSynchronized: json['notSynchronized'],
         typeCard: json['typeCard'] ?? TypeCardEnum.task,
       );
+
+  Map get toJSON => {
+        'amount': amount!.toDouble(),
+        'description': description!,
+        'expense_date': expenseDate!,
+        'id': id,
+      };
 }

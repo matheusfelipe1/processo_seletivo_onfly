@@ -2,23 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:processo_seletivo_onfly/shared/enum/card_enum.dart';
 import 'package:processo_seletivo_onfly/shared/static/app_colors.dart';
 
 class CardFormField extends StatefulWidget {
   final String title;
+  TypeCardTextForm? type = TypeCardTextForm.text;
   final String hint;
   final Function(String)? onComplete;
   final TextInputFormatter? mask;
   final NumberFormat? format;
   final Icon? icon;
-  const CardFormField(
+  final TextEditingController controller;
+  CardFormField(
       {super.key,
       required this.title,
       this.onComplete,
       this.mask,
+      this.type,
       this.format,
       this.icon,
-      required this.hint});
+      required this.hint, required this.controller});
 
   @override
   State<CardFormField> createState() => _CardFormFieldState();
@@ -42,6 +46,21 @@ class _CardFormFieldState extends State<CardFormField> {
                   color: Color.fromARGB(255, 131, 131, 131)),
             ),
             TextFormField(
+              validator: (text) {
+                if (text == null) return 'This field cannot be empty';
+                if (text.isEmpty) return 'This field cannot be empty';
+                if (widget.type == TypeCardTextForm.amount) {
+                  final newText = text.replaceAll('\$ ', '');
+                  if (double.tryParse(newText) == 0.0) return 'Amount cannot be \$ 0.0';
+                } 
+                if (widget.type == TypeCardTextForm.time) {
+                  final newText = text.replaceAll(':', '');
+                  if (int.tryParse(newText) == null) return 'Time cannot be empty';
+                  if (int.parse(newText) > 2359) return 'Invalid time.';
+                }
+                return null;
+              },
+              controller: widget.controller,
               keyboardType: widget.mask != null || widget.format != null
                   ? TextInputType.number
                   : TextInputType.text,

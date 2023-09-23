@@ -10,3 +10,9 @@ extension CustomList<T> on List {
   bool get isEvent => _even();
   bool get hasOnlyOne => _onlyOneElement();
 }
+
+extension CustomData<T> on String {
+  DateTime get toDateTime {
+    return DateTime.parse(replaceAll('/', '-'));
+  }
+}
