@@ -52,7 +52,7 @@ class _CardDateFieldState extends State<CardDateField> {
                 onChanged: (text) => widget.onComplete?.call(text),
                 onTapOutside: (val) => FocusScope.of(context).unfocus(),
                 decoration: InputDecoration(
-                  suffixIcon: Icon(Icons.calendar_today),
+                  suffixIcon: const Icon(Icons.calendar_today),
                     hintText: 'yyyy/mm/dd',
                     disabledBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey)),

@@ -10,4 +10,7 @@ abstract class IAuthController {
 
   final IAuthRepository auth = AuthRepository();
 
+  dynamic onReceivedEvent(dynamic event);
+
+  Function(List<ExpenseModel>)? onDispatchExpenses;
 }

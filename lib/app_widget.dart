@@ -11,6 +11,7 @@ class AppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'OnFly',
+      locale: const Locale('pt', 'BR'),
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       getPages: AppRoutes.pages,

@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_core/get_core.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:intl/intl.dart';
+import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
 
 class CardTaskWidget extends StatefulWidget {
-  const CardTaskWidget({super.key});
+  final ExpenseModel expense;
+  const CardTaskWidget({super.key, required this.expense});
 
   @override
   State<CardTaskWidget> createState() => _CardTaskWidgetState();
@@ -27,7 +30,7 @@ class _CardTaskWidgetState extends State<CardTaskWidget> {
                 children: [
                   Padding(
                     padding: EdgeInsets.all(size.width * .05),
-                    child: Text('Are you sure you want to delete this task?',
+                    child: Text('Are you sure you want to delete this expense?',
                         style: TextStyle(
                             fontFamily: 'Poppins', fontSize: size.width * .05)),
                   ),
@@ -61,6 +64,19 @@ class _CardTaskWidgetState extends State<CardTaskWidget> {
     }
   }
 
+  final numberFormat = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+  final dateFormat = DateFormat("HH:mm 'h'");
+  String showDate = '';
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final date = DateTime.tryParse(widget.expense.expenseDate ?? '');
+    if (date != null) {
+      showDate = dateFormat.format(date);
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -94,7 +110,7 @@ class _CardTaskWidgetState extends State<CardTaskWidget> {
                         _showBottomSheet();
                       },
                       icon: const Icon(FontAwesomeIcons.trash)),
-                  const Text('Delete task',
+                  const Text('Delete expense',
                       style: TextStyle(fontFamily: 'Poppins'))
                 ],
               ),
@@ -111,23 +127,23 @@ class _CardTaskWidgetState extends State<CardTaskWidget> {
                   Positioned(
                       top: size.width * .03,
                       left: size.width * .14,
-                      child: const Text(
-                        'Coffee',
-                        style: TextStyle(fontFamily: 'Poppins-Bold'),
+                      child: Text(
+                        widget.expense.description ?? '',
+                        style: const TextStyle(fontFamily: 'Poppins-Bold'),
                       )),
                   Positioned(
                       top: size.width * .1,
                       left: size.width * .14,
-                      child: const Text(
-                        'R\$ 10,00',
-                        style: TextStyle(fontFamily: 'Poppins'),
+                      child: Text(
+                        numberFormat.format(widget.expense.amount ?? 0),
+                        style: const TextStyle(fontFamily: 'Poppins'),
                       )),
                   Positioned(
                       top: size.width * .1,
                       right: size.width * .07,
-                      child: const Text(
-                        '08:00',
-                        style: TextStyle(
+                      child: Text(
+                        showDate,
+                        style: const TextStyle(
                             fontFamily: 'Poppins',
                             color: Color.fromARGB(255, 205, 205, 205)),
                       )),

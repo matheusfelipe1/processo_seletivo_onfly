@@ -1,15 +1,18 @@
 import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
 
 class CustomCachedManager {
-  static Set<List<ExpenseModel>> datas = {};
+  static Set<Map> datas = {};
 
-  static List<ExpenseModel> getDatas() {
-    final List<ExpenseModel> values = [];
-    datas.map((e) => values.addAll(e));
-    return values;
+  static Set get<T>(String key) {
+    return datas.where((element) => element['key'] == key).toSet();
   }
 
-  static setDatas(List<ExpenseModel> list) {
-    datas.add(list);
+  static void post(String key, List<ExpenseModel> list) {
+    datas.add({'key': key, 'data': list});
+  }
+
+  static void put(String key, List<ExpenseModel> list) {
+    datas.removeWhere((element) => element['key'] == key);
+    datas.add({'key': key, 'data': list});
   }
 }

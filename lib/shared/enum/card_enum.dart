@@ -1,0 +1,4 @@
+enum TypeCardEnum {
+  date,
+  task
+}

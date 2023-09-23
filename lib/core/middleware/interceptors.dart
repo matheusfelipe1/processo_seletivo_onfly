@@ -1,12 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:processo_seletivo_onfly/core/provider/databases/local_storage.dart';
+import 'package:processo_seletivo_onfly/shared/static/variables_static.dart';
+
 class CustomInterceptors extends Interceptor {
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    options.path.replaceAll('[LOGIN_FORNECIDO]', dotenv.get('LOGIN'));
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    final path = options.path.replaceAll('[LOGIN_FORNECIDO]', dotenv.get('LOGIN'));
+    options.path = path;
     options.headers = {
-      'Authorization': LocalStorage.instance.onGet('token')
+      'Authorization': await LocalStorage.instance.onGet(VariablesStatic.TOKEN)
     };
     print('REQUEST[${options.method}] => PATH: ${options.path}');
     super.onRequest(options, handler);
