@@ -34,4 +34,8 @@ class HomeViewModel extends GetxController {
   void onFiltering(String query) {
     _model.onFilter(query.toLowerCase());
   }
+
+  void delete(String id) {
+    _model.onDeleteExpense(id);
+  }
 }

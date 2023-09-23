@@ -8,7 +8,8 @@ import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
 
 class CardTaskWidget extends StatefulWidget {
   final ExpenseModel expense;
-  const CardTaskWidget({super.key, required this.expense});
+  final Function(String id)? onDelete;
+  const CardTaskWidget({super.key, required this.expense, this.onDelete});
 
   @override
   State<CardTaskWidget> createState() => _CardTaskWidgetState();
@@ -61,6 +62,8 @@ class _CardTaskWidgetState extends State<CardTaskWidget> {
             ));
     if (result == null) {
       setState(() {});
+    } else {
+      widget.onDelete?.call(widget.expense.id!);
     }
   }
 

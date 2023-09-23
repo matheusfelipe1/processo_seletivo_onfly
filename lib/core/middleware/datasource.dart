@@ -9,6 +9,11 @@ class DataSource {
     return response.data;
   }
 
+  Future<dynamic> delete(String path) async {
+    final response = await _http.client.delete(path);
+    return response.data;
+  }
+
   Future<dynamic> post(String path, Map body) async {
     final response = await _http.client.post(path, data: jsonEncode(body));
     return response.data;

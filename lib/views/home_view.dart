@@ -96,19 +96,26 @@ class _HomeViewState extends State<HomeView> {
                             itemBuilder: (_, index) =>
                                 listForAnimations[index]);
                       case StateScreen.hasData:
-                        return  ListView.builder(
+                        return ListView.builder(
                             physics: const BouncingScrollPhysics(),
                             itemCount: controller.expensesList.length,
-                            itemBuilder: (_, index) =>
-                              (() {
-                                switch (controller.expensesList[index].typeCard) {
-                                  case TypeCardEnum.date:
-                                    return CardDateTime(size: size, date: controller.expensesList[index].expenseDate ?? '');
-                                  default:
-                                    return CardTaskWidget(expense: controller.expensesList[index],);
-                                }
-                              }()));
-                                
+                            itemBuilder: (_, index) => (() {
+                                  switch (
+                                      controller.expensesList[index].typeCard) {
+                                    case TypeCardEnum.date:
+                                      return CardDateTime(
+                                          size: size,
+                                          date: controller.expensesList[index]
+                                                  .expenseDate ??
+                                              '');
+                                    default:
+                                      return CardTaskWidget(
+                                        expense: controller.expensesList[index],
+                                        onDelete: (id) => controller.delete(id),
+                                      );
+                                  }
+                                }()));
+
                       default:
                         return Center(
                           child: Text(
