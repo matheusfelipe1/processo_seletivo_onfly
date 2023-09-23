@@ -23,6 +23,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   late final HomeViewModel controller;
+  final _text = TextEditingController();
 
   List<Widget> listForAnimations = List.generate(10, (index) {
     return AnimationShimmer(
@@ -65,6 +66,8 @@ class _HomeViewState extends State<HomeView> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(size.maxWidth * .1),
                   child: TextFormField(
+                    controller: _text,
+                    onChanged: (text) => controller.onFiltering(text),
                     onTapOutside: (detail) => FocusScope.of(context).unfocus(),
                     cursorColor: AppColors.blue,
                     style: const TextStyle(
