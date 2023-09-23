@@ -41,6 +41,7 @@ class _CardDateFieldState extends State<CardDateField> {
                   firstDate: DateTime(2019),
                   lastDate: DateTime(2026)),
               child: TextFormField(
+                onFieldSubmitted: (val) => FocusScope.of(context).nextFocus(),
                 keyboardType: TextInputType.datetime,
                 enabled: false,
                 onTap: () => showDatePicker(

@@ -46,6 +46,7 @@ class _CardFormFieldState extends State<CardFormField> {
               inputFormatters: [widget.mask ?? MaskTextInputFormatter()],
               onChanged: (text) => widget.onComplete?.call(text),
               onTapOutside: (val) => FocusScope.of(context).unfocus(),
+              onFieldSubmitted: (val) => FocusScope.of(context).nextFocus(),
               decoration: InputDecoration(
                 suffixIcon: widget.icon,
                   hintText: widget.hint,
