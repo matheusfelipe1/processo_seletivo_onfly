@@ -1,16 +1,16 @@
-import 'package:processo_seletivo_onfly/core/repositories/auth/auth_repository.dart';
-import 'package:processo_seletivo_onfly/core/repositories/auth/iauth_repository.dart';
+import 'package:processo_seletivo_onfly/core/repositories/providers/provider_repository.dart';
+import 'package:processo_seletivo_onfly/core/repositories/providers/iprovider_repository.dart';
 import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
 
 import '../../events/expense_events.dart';
 
-abstract class IAuthController {
+abstract class IProividerController {
  
   void doAuthenticate();
 
   List<ExpenseModel> expenses = [];
 
-  final IAuthRepository auth = AuthRepository();
+  final IProviderRepository provider= ProviderRepository();
 
   dynamic onReceivedEvent(dynamic event, [ExpenseEvents? action]);
 

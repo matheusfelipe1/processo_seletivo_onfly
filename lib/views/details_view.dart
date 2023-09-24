@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:processo_seletivo_onfly/core/provider/auth/auth_controller.dart';
+import 'package:processo_seletivo_onfly/core/provider/controllers/provider_controller.dart';
 import 'package:processo_seletivo_onfly/shared/static/app_colors.dart';
 import 'package:processo_seletivo_onfly/shared/widgets/card_date_widget.dart';
 
@@ -38,7 +38,7 @@ class _DetailsViewState extends State<DetailsView> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    AuthController().onDisposeDetails();
+    ProividerController().onDisposeDetails();
   }
 
   @override

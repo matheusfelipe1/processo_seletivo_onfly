@@ -5,7 +5,7 @@ import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
 import 'package:processo_seletivo_onfly/shared/static/variables_static.dart';
 
 import '../../core/events/expense_events.dart';
-import '../../core/provider/auth/auth_controller.dart';
+import '../../core/provider/controllers/provider_controller.dart';
 import '../../shared/enum/states_enum.dart';
 
 class HomeExpenseModel {
@@ -16,11 +16,11 @@ class HomeExpenseModel {
   final DateFormat formatDate = DateFormat('yyyy/MM/dd');
   final DateFormat formatTime = DateFormat('HH:mm');
   final _repository = HomeRepository();
-  final _auth = AuthController();
+  final _provider = ProividerController();
 
   HomeExpenseModel({this.list, this.listCached}) {
     _repository.notifyEvents = _onNotifyEvent;
-    _repository.notifyExecutedAction =  _auth.onReceivedEvent;
+    _repository.notifyExecutedAction =  _provider.onReceivedEvent;
     _repository.stateScreen = (p0) => stateScreen?.call(p0);
   }
 
@@ -61,7 +61,7 @@ class HomeExpenseModel {
         onReceivedNewList = list;
         CustomCachedManager.put(VariablesStatic.expenseList, list);
         notifyList?.call(list);
-        _auth.onReceivedEvent(element, event);
+        _provider.onReceivedEvent(element, event);
       default:
     }
   }

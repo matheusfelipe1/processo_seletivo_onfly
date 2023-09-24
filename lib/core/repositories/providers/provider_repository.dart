@@ -9,9 +9,9 @@ import 'package:processo_seletivo_onfly/shared/extensions/app_extensions.dart';
 import 'package:processo_seletivo_onfly/shared/static/endpoints.dart';
 import 'package:processo_seletivo_onfly/shared/static/variables_static.dart';
 
-import 'iauth_repository.dart';
+import 'iprovider_repository.dart';
 
-class AuthRepository implements IAuthRepository {
+class ProviderRepository implements IProviderRepository {
   @override
   // TODO: implement dataSource
   DataSource get dataSource => DataSource();

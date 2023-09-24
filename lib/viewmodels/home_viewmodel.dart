@@ -1,12 +1,12 @@
 import 'package:get/get.dart';
-import 'package:processo_seletivo_onfly/core/provider/auth/auth_controller.dart';
+import 'package:processo_seletivo_onfly/core/provider/controllers/provider_controller.dart';
 
 import '../models/expense/expense_model.dart';
 import '../models/home/home_expense.dart';
 import '../shared/enum/states_enum.dart';
 
 class HomeViewModel extends GetxController {
-  final auth = AuthController();
+  final provider= ProividerController();
   final _model = HomeExpenseModel();
 
   RxList<ExpenseModel> expensesList = <ExpenseModel>[].obs;
@@ -16,10 +16,10 @@ class HomeViewModel extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
-    auth.onDispatchExpenses = (List<ExpenseModel> expenses) =>
+    provider.onDispatchExpenses = (List<ExpenseModel> expenses) =>
         {_onReceivedDatas(expenses), _model.onReceivedNewList = expenses};
     _model.notifyList = _onReceivedDatas;
-    auth.callDispose = _updateContext;
+    provider.callDispose = _updateContext;
     _model.stateScreen= _onNotifyState;
   }
 
