@@ -1,12 +1,15 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:processo_seletivo_onfly/models/details/details_model.dart';
 import 'package:processo_seletivo_onfly/shared/animations/animation_loading.dart';
 import 'package:processo_seletivo_onfly/shared/extensions/app_extensions.dart';
+import 'package:processo_seletivo_onfly/shared/static/variables_static.dart';
 
 import '../models/expense/expense_model.dart';
 import '../shared/enum/states_enum.dart';
+import '../shared/utils/inform_no_internet.dart';
 
 class DetailsViewModel extends GetxController {
   final _model = DetailsModel();
@@ -54,6 +57,7 @@ class DetailsViewModel extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
+    verifyHasInternt();
     _model.onStateScreenSwitched = _onNotifyState;
     _model.onReceivedDatas = _onReceivedDatas;
   }
@@ -97,9 +101,10 @@ class DetailsViewModel extends GetxController {
   }
 
   void registerOrEdit() {
-    _model.current!.expenseDate =
-        DateTime.parse('${formatDateToRegister.format(date.text.toDateTime)}${time.text}:00').toIso8601String();
-        final textAmount = amount.text.replaceAll('\$ ', '').replaceAll(',', '');
+    _model.current!.expenseDate = DateTime.parse(
+            '${formatDateToRegister.format(date.text.toDateTime)}${time.text}:00')
+        .toIso8601String();
+    final textAmount = amount.text.replaceAll('\$ ', '').replaceAll(',', '');
     _model.current!.amount = double.tryParse(textAmount);
     _model.current!.description = description.text;
     if (id == null) {
@@ -110,10 +115,19 @@ class DetailsViewModel extends GetxController {
   }
 
   validValues() {
-    if (description.text.isNotEmpty && amount.text.isNotEmpty && time.text.isNotEmpty && date.text.isNotEmpty) {
+    if (description.text.isNotEmpty &&
+        amount.text.isNotEmpty &&
+        time.text.isNotEmpty &&
+        date.text.isNotEmpty) {
       validForm.value = true;
     } else {
       validForm.value = false;
     }
+  }
+
+  void verifyHasInternt() async {
+    await Dio().head(VariablesStatic.connection).catchError((onError) {
+      InformNoIntenet.show();
+    });
   }
 }

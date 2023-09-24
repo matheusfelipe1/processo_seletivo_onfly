@@ -4,7 +4,7 @@ import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
 
 import '../../events/expense_events.dart';
 
-abstract class IProividerController {
+abstract class IProividerController  {
  
   void doAuthenticate();
 
@@ -19,4 +19,8 @@ abstract class IProividerController {
   void onDisposeDetails();
 
   Function()? callDispose;
+
+  void verifyHasInternetConnection();
+
+  void startStream();
 }

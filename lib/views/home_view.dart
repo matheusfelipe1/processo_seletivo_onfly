@@ -13,6 +13,7 @@ import 'package:processo_seletivo_onfly/shared/widgets/custom_base_widget.dart';
 
 import '../models/expense/expense_model.dart';
 import '../shared/animations/animation_shimmer.dart';
+import '../shared/static/variables_static.dart';
 import '../viewmodels/home_viewmodel.dart';
 
 class HomeView extends StatefulWidget {
@@ -26,6 +27,7 @@ class _HomeViewState extends State<HomeView>
     with AutomaticKeepAliveClientMixin {
   late final HomeViewModel controller;
   final _text = TextEditingController();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Widget> listForAnimations = List.generate(10, (index) {
     return AnimationShimmer(
@@ -95,77 +97,77 @@ class _HomeViewState extends State<HomeView>
               SizedBox(
                 height: size.maxHeight * .75,
                 child: RefreshIndicator(
-                    onRefresh: () async => controller.getAll(true),
-                    child: Obx(
-                  () =>  SizedBox(child: (() {
-                        switch (controller.state.value) {
-                          case StateScreen.waiting:
-                            return ListView.builder(
-                                physics: const BouncingScrollPhysics(),
-                                itemCount: listForAnimations.length,
-                                itemBuilder: (_, index) =>
-                                    listForAnimations[index]);
-                          case StateScreen.hasData:
-                            return ListView.builder(
-                                physics: const BouncingScrollPhysics(),
-                                itemCount: controller.expensesList.length,
-                                itemBuilder: (_, index) => (() {
-                                      switch (index == 0 || controller.expensesList
-                                          .showDateHere(index)) {
-                                        case true:
-                                          return Column(
-                                            children: [
-                                              CardDateTime(
-                                                  size: size,
-                                                  date: controller
-                                                          .expensesList[index]
-                                                          .expenseDate ??
-                                                      ''),
-                                              InkWell(
-                                                onTap: () => Get.toNamed(
-                                                    AppPaths.details,
-                                                    arguments: controller
-                                                        .expensesList[index].id),
-                                                child: CardTaskWidget(
-                                                  expense: controller
-                                                      .expensesList[index],
-                                                  onDelete: (id) =>
-                                                      controller.delete(id),
-                                                ),
-                                              )
-                                            ],
-                                          );
-                                        default:
-                                          return InkWell(
-                                            onTap: () => Get.toNamed(
-                                                AppPaths.details,
-                                                arguments: controller
-                                                    .expensesList[index].id),
-                                            child: CardTaskWidget(
-                                              expense:
-                                                  controller.expensesList[index],
-                                              onDelete: (id) =>
-                                                  controller.delete(id),
-                                            ),
-                                          );
-                                      }
-                                    }()));
-                                      
-                          default:
-                            return Center(
-                              child: Text(
-                                'Nobody task was founded',
-                                style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: size.minWidth * .05),
-                              ),
-                            );
-                        }
-                      })()),
-                    ),
+                  onRefresh: () async => controller.getAll(true),
+                  child: Obx(
+                    () => SizedBox(child: (() {
+                      switch (controller.state.value) {
+                        case StateScreen.waiting:
+                          return ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: listForAnimations.length,
+                              itemBuilder: (_, index) =>
+                                  listForAnimations[index]);
+                        case StateScreen.hasData:
+                          return ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: controller.expensesList.length,
+                              itemBuilder: (_, index) => (() {
+                                    switch (index == 0 ||
+                                        controller.expensesList
+                                            .showDateHere(index)) {
+                                      case true:
+                                        return Column(
+                                          children: [
+                                            CardDateTime(
+                                                size: size,
+                                                date: controller
+                                                        .expensesList[index]
+                                                        .expenseDate ??
+                                                    ''),
+                                            InkWell(
+                                              onTap: () => Get.toNamed(
+                                                  AppPaths.details,
+                                                  arguments: controller
+                                                      .expensesList[index].id),
+                                              child: CardTaskWidget(
+                                                expense: controller
+                                                    .expensesList[index],
+                                                onDelete: (id) =>
+                                                    controller.delete(id),
+                                              ),
+                                            )
+                                          ],
+                                        );
+                                      default:
+                                        return InkWell(
+                                          onTap: () => Get.toNamed(
+                                              AppPaths.details,
+                                              arguments: controller
+                                                  .expensesList[index].id),
+                                          child: CardTaskWidget(
+                                            expense:
+                                                controller.expensesList[index],
+                                            onDelete: (id) =>
+                                                controller.delete(id),
+                                          ),
+                                        );
+                                    }
+                                  }()));
+
+                        default:
+                          return Center(
+                            child: Text(
+                              'Nobody task was founded',
+                              style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: size.minWidth * .05),
+                            ),
+                          );
+                      }
+                    })()),
                   ),
                 ),
-              
+              ),
             ],
           ),
         ),
