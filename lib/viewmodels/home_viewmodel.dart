@@ -19,6 +19,8 @@ class HomeViewModel extends GetxController {
     auth.onDispatchExpenses = (List<ExpenseModel> expenses) =>
         {_onReceivedDatas(expenses), _model.onReceivedNewList = expenses};
     _model.notifyList = _onReceivedDatas;
+    auth.callDispose = _updateContext;
+    _model.stateScreen= _onNotifyState;
   }
 
   void _onReceivedDatas(List<ExpenseModel> expenses) {
@@ -37,5 +39,15 @@ class HomeViewModel extends GetxController {
 
   void delete(String id) {
     _model.onDeleteExpense(id);
+  }
+
+  Function()? updateContext;
+
+  void _updateContext() {
+    updateContext?.call();
+  }
+
+  void getAll([bool force = false]) {
+    _model.getAll(force);
   }
 }

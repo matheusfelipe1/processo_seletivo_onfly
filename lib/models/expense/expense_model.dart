@@ -12,7 +12,6 @@ class ExpenseModel {
   String? longitude;
   String? updated;
   bool? notSynchronized;
-  TypeCardEnum? typeCard;
 
   ExpenseModel(
       {this.amount,
@@ -25,23 +24,21 @@ class ExpenseModel {
       this.latitude,
       this.longitude,
       this.updated,
-      this.notSynchronized,
-      this.typeCard});
+      this.notSynchronized});
 
-  factory ExpenseModel.fromJSON(Map<String, dynamic> json) => ExpenseModel(
-        amount: json['amount'].toDouble(),
-        collectionId: json['collectionId'],
-        collectionName: json['collectionName'],
-        created: json['created'],
-        description: json['description'],
-        expenseDate: json['expense_date'],
-        id: json['id'],
-        latitude: json['latitude'],
-        longitude: json['longitude'],
-        updated: json['updated'],
-        notSynchronized: json['notSynchronized'],
-        typeCard: json['typeCard'] ?? TypeCardEnum.task,
-      );
+  factory ExpenseModel.fromJSON(Map<String?, dynamic> json) => ExpenseModel(
+              amount: json['amount'].toDouble(),
+              collectionId: json['collectionId'],
+              collectionName: json['collectionName'],
+              created: json['created'],
+              description: json['description'],
+              expenseDate: json['expense_date'],
+              id: json['id'],
+              latitude: json['latitude'],
+              longitude: json['longitude'],
+              updated: json['updated'],
+              notSynchronized: json['notSynchronized'],
+            );
 
   Map get toJSON => {
         'amount': amount!.toDouble(),

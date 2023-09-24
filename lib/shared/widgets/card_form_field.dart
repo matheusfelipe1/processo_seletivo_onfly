@@ -55,6 +55,7 @@ class _CardFormFieldState extends State<CardFormField> {
                 } 
                 if (widget.type == TypeCardTextForm.time) {
                   final newText = text.replaceAll(':', '');
+                  if (newText.length < 4) return 'Invalid time.';
                   if (int.tryParse(newText) == null) return 'Time cannot be empty';
                   if (int.parse(newText) > 2359) return 'Invalid time.';
                 }

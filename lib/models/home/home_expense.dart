@@ -5,6 +5,8 @@ import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
 import 'package:processo_seletivo_onfly/shared/static/variables_static.dart';
 
 import '../../core/events/expense_events.dart';
+import '../../core/provider/auth/auth_controller.dart';
+import '../../shared/enum/states_enum.dart';
 
 class HomeExpenseModel {
   List<ExpenseModel>? list;
@@ -14,12 +16,17 @@ class HomeExpenseModel {
   final DateFormat formatDate = DateFormat('yyyy/MM/dd');
   final DateFormat formatTime = DateFormat('HH:mm');
   final _repository = HomeRepository();
+  final _auth = AuthController();
 
   HomeExpenseModel({this.list, this.listCached}) {
     _repository.notifyEvents = _onNotifyEvent;
+    _repository.notifyExecutedAction =  _auth.onReceivedEvent;
+    _repository.stateScreen = (p0) => stateScreen?.call(p0);
   }
 
   Function(List<ExpenseModel>)? notifyList;
+
+  Function(StateScreen newState)? stateScreen;
 
   void onFilter(String query) {
     final newList = listCached!
@@ -50,10 +57,18 @@ class HomeExpenseModel {
       case ExpenseDelete:
         final list = [...listCached!]
           ..removeWhere((element) => element.id == id);
+          final element = this.list!.firstWhere((element) => element.id == id);
         onReceivedNewList = list;
         CustomCachedManager.put(VariablesStatic.expenseList, list);
         notifyList?.call(list);
+        _auth.onReceivedEvent(element, event);
       default:
     }
   }
+
+  void getAll([bool force = false]) {
+    _repository.getAll(force);
+  }
+
+  
 }

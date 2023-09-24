@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:processo_seletivo_onfly/core/provider/auth/auth_controller.dart';
 import 'package:processo_seletivo_onfly/shared/static/app_colors.dart';
 import 'package:processo_seletivo_onfly/shared/widgets/card_date_widget.dart';
 
@@ -30,6 +31,14 @@ class _DetailsViewState extends State<DetailsView> {
     // TODO: implement initState
     super.initState();
     controller = Get.put(DetailsViewModel(widget.id));
+    controller.updateContext = () => setState(() {});
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    AuthController().onDisposeDetails();
   }
 
   @override
@@ -38,6 +47,9 @@ class _DetailsViewState extends State<DetailsView> {
         builder: (size) => Scaffold(
               backgroundColor: Colors.transparent,
               body: Form(
+                onChanged: () {
+                  controller.validValues();
+                },
                 key: key,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,31 +133,27 @@ class _DetailsViewState extends State<DetailsView> {
                 child: SizedBox(
                   width: double.maxFinite,
                   height: size.maxWidth * .12,
-                  child: Material(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25)),
-                    color: controller.amount.text.isEmpty ||
-                              controller.description.text.isEmpty ||
-                              controller.date.text.isEmpty ||
-                              controller.time.text.isEmpty
-                          ? Colors.grey: AppColors.blue,
-                    child: InkWell(
-                      onTap: controller.amount.text.isEmpty ||
-                              controller.description.text.isEmpty ||
-                              controller.date.text.isEmpty ||
-                              controller.time.text.isEmpty
-                          ? null
-                          : () {
-                              if (key.currentState?.validate() ?? false) {
-                                controller.registerOrEdit();
-                              }
-                            },
-                      child: Center(
-                        child: Text(widget.id == null ? 'Register' : 'Edit',
-                            style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: size.maxWidth * .05)),
+                  child: Obx(
+                    () => Material(
+                      elevation: 10,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25)),
+                      color: !controller.validForm.value
+                            ? Colors.grey: AppColors.blue,
+                      child: InkWell(
+                        onTap: !controller.validForm.value
+                            ? null
+                            : () {
+                                if (key.currentState?.validate() ?? false) {
+                                  controller.registerOrEdit();
+                                }
+                              },
+                        child: Center(
+                          child: Text(controller.id == null ? 'Register' : 'Edit',
+                              style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: size.maxWidth * .05)),
+                        ),
                       ),
                     ),
                   ),

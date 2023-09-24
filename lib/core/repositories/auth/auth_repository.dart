@@ -45,13 +45,7 @@ class AuthRepository implements IAuthRepository {
       final list = data["items"];
       if (list is List) {
         if (list.isNotEmpty) {
-          if (list.hasOnlyOne) {
-            final Map<String, dynamic> map = {};
-            map.addAll(list.first);
-            map.addAll({'typeCard': TypeCardEnum.date});
-            list.insert(0, map);
-            list[1]['typeCard'] = TypeCardEnum.task;
-          }
+          list.sort((a, b) => b['expense_date'].toString().toDate.compareTo(a['expense_date'].toString().toDate));
           values = list
               .cast<Map<String, dynamic>>()
               .map(ExpenseModel.fromJSON)

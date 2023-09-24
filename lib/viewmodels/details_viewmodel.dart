@@ -24,9 +24,13 @@ class DetailsViewModel extends GetxController {
 
   String? id;
 
+  Function()? updateContext;
+
   DetailsViewModel(this.id);
 
   Rx<StateScreen> stateScreen = StateScreen.noHasData.obs;
+
+  RxBool validForm = false.obs;
 
   @override
   void onReady() {
@@ -54,6 +58,12 @@ class DetailsViewModel extends GetxController {
     _model.onReceivedDatas = _onReceivedDatas;
   }
 
+  @override
+  void onClose() {
+    // TODO: implement onClose
+    super.onClose();
+  }
+
   void _getUniqueData(String? id) {
     if (id != null) {
       _model.get(id);
@@ -67,6 +77,7 @@ class DetailsViewModel extends GetxController {
   }
 
   void _onReceivedDatas(ExpenseModel data) {
+    id = data.id;
     description.text = data.description ?? '';
     amount.text = data.amount?.toString() ?? '';
     date.text = data.expenseDate ?? '';
@@ -82,18 +93,27 @@ class DetailsViewModel extends GetxController {
     if (double.tryParse(amount.text) != null) {
       amount.text = formatCurrency.format(double.parse(amount.text));
     }
+    updateContext?.call();
   }
 
   void registerOrEdit() {
     _model.current!.expenseDate =
-        '${formatDateToRegister.format(date.text.toDateTime)}${time.text}:00';
-        final textAmount = amount.text.replaceAll('\$ ', '');
+        DateTime.parse('${formatDateToRegister.format(date.text.toDateTime)}${time.text}:00').toIso8601String();
+        final textAmount = amount.text.replaceAll('\$ ', '').replaceAll(',', '');
     _model.current!.amount = double.tryParse(textAmount);
     _model.current!.description = description.text;
     if (id == null) {
       _model.register();
     } else {
       _model.update(id!);
+    }
+  }
+
+  validValues() {
+    if (description.text.isNotEmpty && amount.text.isNotEmpty && time.text.isNotEmpty && date.text.isNotEmpty) {
+      validForm.value = true;
+    } else {
+      validForm.value = false;
     }
   }
 }

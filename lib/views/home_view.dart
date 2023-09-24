@@ -4,6 +4,7 @@ import 'package:get/get_core/get_core.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:processo_seletivo_onfly/shared/enum/card_enum.dart';
 import 'package:processo_seletivo_onfly/shared/enum/states_enum.dart';
+import 'package:processo_seletivo_onfly/shared/extensions/app_extensions.dart';
 import 'package:processo_seletivo_onfly/shared/routes/app_paths.dart';
 import 'package:processo_seletivo_onfly/shared/static/app_colors.dart';
 import 'package:processo_seletivo_onfly/shared/widgets/card_datetime_widget.dart';
@@ -21,7 +22,8 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView>
+    with AutomaticKeepAliveClientMixin {
   late final HomeViewModel controller;
   final _text = TextEditingController();
 
@@ -37,10 +39,16 @@ class _HomeViewState extends State<HomeView> {
     // TODO: implement initState
     super.initState();
     controller = Get.put(HomeViewModel());
+    controller.updateContext = () {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        setState(() {});
+      });
+    };
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return CustomBaseWidget(
       builder: (size) => Scaffold(
         backgroundColor: Colors.transparent,
@@ -86,57 +94,78 @@ class _HomeViewState extends State<HomeView> {
               ),
               SizedBox(
                 height: size.maxHeight * .75,
-                child: Obx(
-                  () => SizedBox(child: (() {
-                    switch (controller.state.value) {
-                      case StateScreen.waiting:
-                        return ListView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            itemCount: listForAnimations.length,
-                            itemBuilder: (_, index) =>
-                                listForAnimations[index]);
-                      case StateScreen.hasData:
-                        return ListView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            itemCount: controller.expensesList.length,
-                            itemBuilder: (_, index) => (() {
-                                  switch (
-                                      controller.expensesList[index].typeCard) {
-                                    case TypeCardEnum.date:
-                                      return CardDateTime(
-                                          size: size,
-                                          date: controller.expensesList[index]
-                                                  .expenseDate ??
-                                              '');
-                                    default:
-                                      return InkWell(
-                                        onTap: () => Get.toNamed(
-                                            AppPaths.details,
-                                            arguments: controller
-                                                .expensesList[index].id),
-                                        child: CardTaskWidget(
-                                          expense:
-                                              controller.expensesList[index],
-                                          onDelete: (id) =>
-                                              controller.delete(id),
-                                        ),
-                                      );
-                                  }
-                                }()));
-
-                      default:
-                        return Center(
-                          child: Text(
-                            'Nobody task was founded',
-                            style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: size.minWidth * .05),
-                          ),
-                        );
-                    }
-                  })()),
+                child: RefreshIndicator(
+                    onRefresh: () async => controller.getAll(true),
+                    child: Obx(
+                  () =>  SizedBox(child: (() {
+                        switch (controller.state.value) {
+                          case StateScreen.waiting:
+                            return ListView.builder(
+                                physics: const BouncingScrollPhysics(),
+                                itemCount: listForAnimations.length,
+                                itemBuilder: (_, index) =>
+                                    listForAnimations[index]);
+                          case StateScreen.hasData:
+                            return ListView.builder(
+                                physics: const BouncingScrollPhysics(),
+                                itemCount: controller.expensesList.length,
+                                itemBuilder: (_, index) => (() {
+                                      switch (index == 0 || controller.expensesList
+                                          .showDateHere(index)) {
+                                        case true:
+                                          return Column(
+                                            children: [
+                                              CardDateTime(
+                                                  size: size,
+                                                  date: controller
+                                                          .expensesList[index]
+                                                          .expenseDate ??
+                                                      ''),
+                                              InkWell(
+                                                onTap: () => Get.toNamed(
+                                                    AppPaths.details,
+                                                    arguments: controller
+                                                        .expensesList[index].id),
+                                                child: CardTaskWidget(
+                                                  expense: controller
+                                                      .expensesList[index],
+                                                  onDelete: (id) =>
+                                                      controller.delete(id),
+                                                ),
+                                              )
+                                            ],
+                                          );
+                                        default:
+                                          return InkWell(
+                                            onTap: () => Get.toNamed(
+                                                AppPaths.details,
+                                                arguments: controller
+                                                    .expensesList[index].id),
+                                            child: CardTaskWidget(
+                                              expense:
+                                                  controller.expensesList[index],
+                                              onDelete: (id) =>
+                                                  controller.delete(id),
+                                            ),
+                                          );
+                                      }
+                                    }()));
+                                      
+                          default:
+                            return Center(
+                              child: Text(
+                                'Nobody task was founded',
+                                style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: size.minWidth * .05),
+                              ),
+                            );
+                        }
+                      })()),
+                    ),
+                  ),
                 ),
-              ),
+              
             ],
           ),
         ),
@@ -153,4 +182,8 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
