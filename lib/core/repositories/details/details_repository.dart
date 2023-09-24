@@ -1,10 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:processo_seletivo_onfly/core/events/expense_events.dart';
 import 'package:processo_seletivo_onfly/core/middleware/datasource.dart';
+import 'package:processo_seletivo_onfly/core/provider/databases/internal_database.dart';
 import 'package:processo_seletivo_onfly/core/repositories/details/idetails_repository.dart';
 import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
 import 'package:processo_seletivo_onfly/shared/enum/states_enum.dart';
 import 'package:processo_seletivo_onfly/shared/static/endpoints.dart';
+
+import '../../../shared/utils/inform_no_internet.dart';
+import '../../events/database_events.dart';
 
 class DetailsRepository implements IDetailsRepository {
   @override
@@ -41,13 +45,14 @@ class DetailsRepository implements IDetailsRepository {
     } catch (e) {
       state = StateScreen.hasData;
       debugPrint(e.toString());
-      dispatchValue?.call((
-        ExpenseModel(
-            description: body['description'],
-            expenseDate: body['expense_date'],
-            amount: body['amount']),
-        ExpenseAdded()
-      ));
+      final value = ExpenseModel(
+          description: body['description'],
+          expenseDate: body['expense_date'],
+          amount: body['amount']);
+      dispatchValue?.call((value, ExpenseAdded()));
+      database.executeActions(DatabaseAdded(), value);
+      statePage?.call(state);
+      InformNoIntenet.showMessageInternalDatabase();
     } finally {
       statePage?.call(state);
     }
@@ -64,14 +69,15 @@ class DetailsRepository implements IDetailsRepository {
     } catch (e) {
       debugPrint(e.toString());
       state = StateScreen.hasData;
-      dispatchValue?.call((
-        ExpenseModel(
-            id: id,
-            description: body['description'],
-            expenseDate: body['expense_date'],
-            amount: body['amount']),
-        ExpenseAdded()
-      ));
+      final value = ExpenseModel(
+          id: id,
+          description: body['description'],
+          expenseDate: body['expense_date'],
+          amount: body['amount']);
+      dispatchValue?.call((value, ExpenseAdded()));
+      database.executeActions(DatabaseUpdate(), value);
+      statePage?.call(state);
+      InformNoIntenet.showMessageInternalDatabase();
     } finally {
       statePage?.call(state);
     }
@@ -79,4 +85,8 @@ class DetailsRepository implements IDetailsRepository {
 
   @override
   Function((ExpenseModel p1, ExpenseEvents p2))? dispatchValue;
+
+  @override
+  // TODO: implement database
+  InternalDatabase get database => InternalDatabase.instance;
 }

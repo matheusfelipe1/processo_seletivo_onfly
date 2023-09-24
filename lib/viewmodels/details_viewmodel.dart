@@ -126,8 +126,10 @@ class DetailsViewModel extends GetxController {
   }
 
   void verifyHasInternt() async {
-    await Dio().head(VariablesStatic.connection).catchError((onError) {
-      InformNoIntenet.show();
-    });
+    if (id != null) {
+      await Dio().head(VariablesStatic.connection).catchError((onError) {
+        InformNoIntenet.show();
+      });
+    }
   }
 }

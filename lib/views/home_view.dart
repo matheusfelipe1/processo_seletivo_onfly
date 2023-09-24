@@ -14,6 +14,8 @@ import 'package:processo_seletivo_onfly/shared/widgets/custom_base_widget.dart';
 import '../models/expense/expense_model.dart';
 import '../shared/animations/animation_shimmer.dart';
 import '../shared/static/variables_static.dart';
+import '../shared/utils/inform_no_internet.dart';
+import '../shared/utils/internet_info.dart';
 import '../viewmodels/home_viewmodel.dart';
 
 class HomeView extends StatefulWidget {
@@ -125,30 +127,52 @@ class _HomeViewState extends State<HomeView>
                                                         .expenseDate ??
                                                     ''),
                                             InkWell(
-                                              onTap: () => Get.toNamed(
-                                                  AppPaths.details,
-                                                  arguments: controller
-                                                      .expensesList[index].id),
+                                              onTap: () {
+                                                if (controller
+                                                        .expensesList[index]
+                                                        .id ==
+                                                    null) {
+                                                  InformNoIntenet
+                                                      .showMessageInternalDatabase3();
+                                                } else {
+                                                  Get.toNamed(AppPaths.details,
+                                                      arguments: controller
+                                                          .expensesList[index]
+                                                          .id);
+                                                }
+                                              },
                                               child: CardTaskWidget(
                                                 expense: controller
                                                     .expensesList[index],
                                                 onDelete: (id) =>
-                                                    controller.delete(id),
+                                                    controller.delete(
+                                                        id,
+                                                        controller.expensesList[
+                                                            index]),
                                               ),
                                             )
                                           ],
                                         );
                                       default:
                                         return InkWell(
-                                          onTap: () => Get.toNamed(
-                                              AppPaths.details,
-                                              arguments: controller
-                                                  .expensesList[index].id),
+                                          onTap: () {
+                                            if (controller
+                                                    .expensesList[index].id ==
+                                                null) {
+                                              InformNoIntenet
+                                                  .showMessageInternalDatabase3();
+                                            } else {
+                                              Get.toNamed(AppPaths.details,
+                                                  arguments: controller
+                                                      .expensesList[index].id);
+                                            }
+                                          },
                                           child: CardTaskWidget(
                                             expense:
                                                 controller.expensesList[index],
-                                            onDelete: (id) =>
-                                                controller.delete(id),
+                                            onDelete: (id) => controller.delete(
+                                                id,
+                                                controller.expensesList[index]),
                                           ),
                                         );
                                     }

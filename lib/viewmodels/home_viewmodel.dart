@@ -37,8 +37,8 @@ class HomeViewModel extends GetxController {
     _model.onFilter(query.toLowerCase());
   }
 
-  void delete(String id) {
-    _model.onDeleteExpense(id);
+  void delete(String id, ExpenseModel model) {
+    _model.onDeleteExpense(id, model);
   }
 
   Function()? updateContext;

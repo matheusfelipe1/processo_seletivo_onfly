@@ -48,8 +48,8 @@ class HomeExpenseModel {
   set onReceivedNewList(List<ExpenseModel> newList) =>
       {list = newList, listCached = newList};
 
-  void onDeleteExpense(String id) async {
-    await _repository.delete(id);
+  void onDeleteExpense(String id, ExpenseModel model) async {
+    await _repository.delete(id, model);
   }
 
   void _onNotifyEvent(ExpenseEvents event, [String? id]) {

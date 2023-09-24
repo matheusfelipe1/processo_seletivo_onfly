@@ -3,6 +3,7 @@ import 'package:processo_seletivo_onfly/core/middleware/datasource.dart';
 import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
 
 import '../../../shared/enum/states_enum.dart';
+import '../../provider/databases/internal_database.dart';
 
 abstract class IDetailsRepository {
 
@@ -17,4 +18,6 @@ abstract class IDetailsRepository {
   Future<void> register(Map body);
 
   Future<void> update(String id, Map body);
+
+  final database = InternalDatabase.instance;
 }

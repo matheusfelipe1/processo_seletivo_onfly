@@ -51,7 +51,9 @@ extension CustomDatas on List<ExpenseModel> {
   }
 
   void addWhere(ExpenseModel item) {
-    removeWhere((element) => element.id == item.id);
+    if (item.id != null) {
+      removeWhere((element) => element.id == item.id);
+    }
     final index = indexWhere((element) => item.expenseDate
         .toString()
         .toDate
@@ -59,6 +61,24 @@ extension CustomDatas on List<ExpenseModel> {
     if (index == -1) {
       add(item);
     } else {
-      insert(index, item);}
+      insert(index, item);
+    }
+  }
+
+  void addWhereFromDatabase(ExpenseModel item) {
+    if (!contains(item)) {
+      if (item.id != null) {
+        removeWhere((element) => element.id == item.id);
+      }
+      final index = indexWhere((element) => item.expenseDate
+          .toString()
+          .toDate
+          .isAfter(element.expenseDate.toString().toDate));
+      if (index == -1) {
+        add(item);
+      } else {
+        insert(index, item);
+      }
+    }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:processo_seletivo_onfly/core/events/database_events.dart';
 import 'package:processo_seletivo_onfly/core/events/expense_events.dart';
 import 'package:processo_seletivo_onfly/core/middleware/datasource.dart';
+import 'package:processo_seletivo_onfly/core/provider/databases/internal_database.dart';
 
 import 'package:processo_seletivo_onfly/core/provider/databases/local_storage.dart';
 import 'package:processo_seletivo_onfly/shared/enum/states_enum.dart';
@@ -9,6 +11,7 @@ import 'package:processo_seletivo_onfly/shared/extensions/app_extensions.dart';
 import '../../../models/expense/expense_model.dart';
 import '../../../shared/static/endpoints.dart';
 import '../../../shared/static/variables_static.dart';
+import '../../../shared/utils/inform_no_internet.dart';
 import '../../provider/cached/custom_cached.dart';
 import 'ihome_repository.dart';
 
@@ -63,9 +66,17 @@ class HomeRepository implements IHomeRepository {
   LocalStorage get localStorage => LocalStorage();
 
   @override
-  Future<void> delete(String id) async {
-    await dataSource.delete('${Endpoints.expense}/$id');
-    notifyEvents?.call(ExpenseDelete(), id);
+  Future<void> delete(String id, ExpenseModel expense) async {
+    try {
+      await dataSource.delete('${Endpoints.expense}/$id');
+    } catch (e) {
+      debugPrint(e.toString());
+      database.executeActions(DatabaseRemoved(), expense);
+      InformNoIntenet.showMessageInternalDatabase2();
+    } finally {
+      notifyEvents?.call(ExpenseDelete(), id);
+    }
+    
   }
 
   @override
@@ -73,4 +84,8 @@ class HomeRepository implements IHomeRepository {
 
   @override
   Function(StateScreen newState)? stateScreen;
+
+  @override
+  // TODO: implement database
+  InternalDatabase get database => InternalDatabase.instance;
 }

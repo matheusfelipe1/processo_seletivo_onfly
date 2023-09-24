@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:processo_seletivo_onfly/core/events/database_events.dart';
 import 'package:processo_seletivo_onfly/core/middleware/datasource.dart';
 import 'package:processo_seletivo_onfly/core/provider/cached/custom_cached.dart';
 import 'package:processo_seletivo_onfly/core/provider/databases/local_storage.dart';
 import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
+import 'package:processo_seletivo_onfly/shared/animations/animation_loading.dart';
 import 'package:processo_seletivo_onfly/shared/extensions/app_extensions.dart';
 import 'package:processo_seletivo_onfly/shared/static/endpoints.dart';
 import 'package:processo_seletivo_onfly/shared/static/variables_static.dart';
 
+import '../../../shared/enum/status_request.dart';
 import 'iprovider_repository.dart';
 
 class ProviderRepository implements IProviderRepository {
@@ -59,6 +62,65 @@ class ProviderRepository implements IProviderRepository {
       debugPrint(e.toString());
     } finally {
       notifyExecutedAction?.call(values);
+    }
+  }
+
+  @override
+  Future<List<(ExpenseModel, StatusRequest, DatabaseEvent)>> synchronize(List<(ExpenseModel, DatabaseEvent)> datas) async {
+    final List<(ExpenseModel, StatusRequest, DatabaseEvent)> list = [];
+    try {
+      for (var element in datas) {
+        switch (element.$2.runtimeType) {
+          case DatabaseAdded:
+            list.add((element.$1, await register(element.$1.toJSON), element.$2));
+            break;
+          case DatabaseUpdate:
+            list.add((element.$1, await update(element.$1.id!, element.$1.toJSON), element.$2));
+            break;
+          case DatabaseRemoved:
+            list.add((element.$1, await delete(element.$1.id!), element.$2));
+            break;
+          default:
+        }
+      }
+      await getAll();
+    } catch (e) {
+      print(e.toString());
+    } finally {
+      return list;
+    }
+  }
+  
+  @override
+  Future<StatusRequest> register(Map body) async {
+    try {
+      await dataSource.post(Endpoints.expense, body);
+      return StatusRequest.success;
+    } catch (e) {
+      debugPrint(e.toString());
+      return StatusRequest.failure;
+    } 
+  }
+
+  @override
+  Future<StatusRequest> update(String id, Map body) async {
+    try {
+      await dataSource.patch('${Endpoints.expense}/$id', body);
+      return StatusRequest.success;
+    } catch (e) {
+      debugPrint(e.toString());
+      return StatusRequest.failure;
+    } 
+  }
+  
+  @override
+  Future<StatusRequest> delete(String id) async{
+     try {
+      await dataSource.delete('${Endpoints.expense}/$id');
+      return StatusRequest.success;
+    } catch (e) {
+      debugPrint(e.toString());
+      return StatusRequest.failure;
     }
   }
 }

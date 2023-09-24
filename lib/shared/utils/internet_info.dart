@@ -6,6 +6,7 @@ import '../enum/state_internet_connection.dart';
 
 class InternetInfo {
   static StateInternetConnection status = StateInternetConnection.unShow;
+  static Function()? syncronizeDatas;
   static void get showNoInternet => status == StateInternetConnection.unShow || status == StateInternetConnection.canSync
       ? {removeSnackbar, ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
           content: const Padding(
@@ -53,6 +54,7 @@ class InternetInfo {
                   IconButton(
                     onPressed: () {
                       removeSnackbar;
+                      syncronizeDatas?.call();
                     },
                     icon: const Icon(Icons.sync),
                   )
