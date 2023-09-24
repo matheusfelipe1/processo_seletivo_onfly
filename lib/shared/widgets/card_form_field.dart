@@ -22,7 +22,8 @@ class CardFormField extends StatefulWidget {
       this.type,
       this.format,
       this.icon,
-      required this.hint, required this.controller});
+      required this.hint,
+      required this.controller});
 
   @override
   State<CardFormField> createState() => _CardFormFieldState();
@@ -51,13 +52,23 @@ class _CardFormFieldState extends State<CardFormField> {
                 if (text.isEmpty) return 'This field cannot be empty';
                 if (widget.type == TypeCardTextForm.amount) {
                   final newText = text.replaceAll('\$ ', '');
-                  if (double.tryParse(newText) == 0.0) return 'Amount cannot be \$ 0.0';
-                } 
+                  if (double.tryParse(newText) == 0.0) {
+                    return 'Amount cannot be \$ 0.0';
+                  }
+                }
                 if (widget.type == TypeCardTextForm.time) {
                   final newText = text.replaceAll(':', '');
                   if (newText.length < 4) return 'Invalid time.';
-                  if (int.tryParse(newText) == null) return 'Time cannot be empty';
+                  if (int.tryParse(newText) == null) {
+                    return 'Time cannot be empty';
+                  }
                   if (int.parse(newText) > 2359) return 'Invalid time.';
+                  if (int.tryParse(newText.split('').getRange(2, 4).join('')) !=
+                          null &&
+                      (int.tryParse(
+                                  newText.split('').getRange(2, 4).join('')) ??
+                              60) >
+                          59) return 'Invalid time.';
                 }
                 return null;
               },

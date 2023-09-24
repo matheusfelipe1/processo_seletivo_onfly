@@ -16,6 +16,8 @@ class CardTaskWidget extends StatefulWidget {
 }
 
 class _CardTaskWidgetState extends State<CardTaskWidget> {
+
+  
   void _showBottomSheet() async {
     final size = MediaQuery.of(context).size;
     final result = await showModalBottomSheet<String?>(
@@ -74,6 +76,16 @@ class _CardTaskWidgetState extends State<CardTaskWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    final date = DateTime.tryParse(widget.expense.expenseDate ?? '');
+    if (date != null) {
+      showDate = dateFormat.format(date);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant CardTaskWidget oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
     final date = DateTime.tryParse(widget.expense.expenseDate ?? '');
     if (date != null) {
       showDate = dateFormat.format(date);
