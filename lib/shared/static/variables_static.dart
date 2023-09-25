@@ -7,5 +7,5 @@ class VariablesStatic {
   static String get expensesTable =>
       'expense';
   static String get expenses =>
-      'CREATE TABLE IF NOT EXISTS expense(id INTEGER PRIMARY KEY AUTOINCREMENT, idExpense TEXT, description TEXT, amount REAL, expense_date TEXT, typeEvent TEXT)';
+      'CREATE TABLE IF NOT EXISTS expense(id INTEGER PRIMARY KEY AUTOINCREMENT, idExpense TEXT, description TEXT, amount REAL, expense_date TEXT, typeEvent TEXT,notSynchronized INTEGER )';
 }

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:processo_seletivo_onfly/core/events/database_events.dart';
 import 'package:processo_seletivo_onfly/core/events/navigation_event.dart';
+import 'package:processo_seletivo_onfly/core/provider/cached/custom_cached.dart';
 import 'package:processo_seletivo_onfly/core/provider/controllers/iprovider_controller.dart';
 import 'package:processo_seletivo_onfly/shared/animations/animation_loading.dart';
 import 'package:processo_seletivo_onfly/shared/enum/status_request.dart';
@@ -40,12 +41,11 @@ class ProividerController extends IProividerController {
     switch (event.runtimeType) {
       case const (List<ExpenseModel>):
         expenses = event;
-        if (expensesInternalDatabase.isNotEmpty) {
-          for (var element in expensesInternalDatabase) {
-            expenses.addWhereFromDatabase(element);
-          }
-        }
+        database.executeActions(DatabaseAddedAll(), expenses);
         onDispatchExpenses?.call(expenses);
+        if (expenses.isEmpty && event.isEmpty) {
+          getListFromInternalDatabase();
+        }
         break;
       case NavigationToHome:
         Get.toNamed(AppPaths.home);
@@ -58,8 +58,13 @@ class ProividerController extends IProividerController {
         expenses.addWhere(event);
         onDispatchExpenses?.call(expenses);
         break;
-      case ExpenseModel when ExpenseAddedFromDatabase == action.runtimeType:
-        expenses.addWhereFromDatabase(event);
+      case const (List<ExpenseModel>)
+          when ExpenseAddedFromDatabase == action.runtimeType:
+        expenses = event;
+        expenses.sort((a, b) => b.expenseDate
+            .toString()
+            .toDate
+            .compareTo(a.expenseDate.toString().toDate));
         onDispatchExpenses?.call(expenses);
         break;
       case ExpenseModel when ExpenseUpdate == action.runtimeType:
@@ -69,6 +74,7 @@ class ProividerController extends IProividerController {
       default:
         break;
     }
+    CustomCachedManager.put(VariablesStatic.expenseList, expenses);
   }
 
   @override
@@ -87,12 +93,9 @@ class ProividerController extends IProividerController {
       await Dio().head(VariablesStatic.connection).then((value) async {
         final datas = await database.executeActions(DatabaseGetAll())
             as List<(ExpenseModel, DatabaseEvent)>;
-        expensesInternalDatabase = datas.map((e) => e.$1).toList();
-        switch (datas.isNotEmpty) {
+        switch (datas.any((e) => e.$1.notSynchronized == true)) {
           case true:
-            for (var item in datas) {
-              onReceivedEvent(item.$1, ExpenseAddedFromDatabase());
-            }
+            onReceivedEvent(datas, ExpenseAddedFromDatabase());
             InternetInfo.showHasIntent;
             break;
           default:
@@ -116,10 +119,7 @@ class ProividerController extends IProividerController {
   @override
   void dataProcessing(
       List<(ExpenseModel, StatusRequest, DatabaseEvent)> datas) async {
-    await database.executeActions(DatabaseRemovedAll());
-    expensesInternalDatabase = [];
     expenses = [];
-    expensesInternalDatabase = datas.map((e) => e.$1).toList();
     for (var element in datas) {
       switch (element.$2) {
         case StatusRequest.failure:
@@ -137,14 +137,33 @@ class ProividerController extends IProividerController {
       InternetInfo.removeSnackbar;
       final datas = await database.executeActions(DatabaseGetAll())
           as List<(ExpenseModel, DatabaseEvent)>;
-      expensesInternalDatabase = datas.map((e) => e.$1).toList();
+      // expensesInternalDatabase = datas.map((e) => e.$1).toList();
       final datasSyncronized = await provider.synchronize(datas);
       dataProcessing(datasSyncronized);
       await Future.delayed(const Duration(milliseconds: 700));
+      await database.executeActions(DatabaseRemovedAll());
       await provider.getAll();
       Loading.hide();
     }).catchError((onError) {
       InformNoIntenet.showMessageInternalDatabase4();
+    });
+  }
+
+  @override
+  void getListFromInternalDatabase() async {
+    await Dio().head(VariablesStatic.connection).catchError((onError) async {
+      final list = await database.executeActions(DatabaseGetAll()) as List;
+      if (expenses.isEmpty && list.isNotEmpty) {
+        final datas = list.map((e) => e.$1).toList().cast<ExpenseModel>();
+        Future.delayed(const Duration(milliseconds: 100), () {
+        expenses = datas;
+        expenses.sort((a, b) => b.expenseDate
+            .toString()
+            .toDate
+            .compareTo(a.expenseDate.toString().toDate));
+        onDispatchExpenses?.call(expenses);
+        });
+      }
     });
   }
 }

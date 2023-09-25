@@ -16,8 +16,6 @@ class CardTaskWidget extends StatefulWidget {
 }
 
 class _CardTaskWidgetState extends State<CardTaskWidget> {
-
-  
   void _showBottomSheet() async {
     final size = MediaQuery.of(context).size;
     final result = await showModalBottomSheet<String?>(
@@ -70,15 +68,15 @@ class _CardTaskWidgetState extends State<CardTaskWidget> {
   }
 
   final numberFormat = NumberFormat.currency(locale: 'en_US', symbol: '\$ ');
-  final dateFormat = DateFormat("HH:mm 'h'");
-  String showDate = '';
+  final timeFormat = DateFormat("HH:mm 'h'");
+  String showTime = '';
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     final date = DateTime.tryParse(widget.expense.expenseDate ?? '');
     if (date != null) {
-      showDate = dateFormat.format(date);
+      showTime = timeFormat.format(date);
     }
   }
 
@@ -88,10 +86,10 @@ class _CardTaskWidgetState extends State<CardTaskWidget> {
     super.didUpdateWidget(oldWidget);
     final date = DateTime.tryParse(widget.expense.expenseDate ?? '');
     if (date != null) {
-      showDate = dateFormat.format(date);
+      showTime = timeFormat.format(date);
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -157,10 +155,21 @@ class _CardTaskWidgetState extends State<CardTaskWidget> {
                       top: size.width * .1,
                       right: size.width * .07,
                       child: Text(
-                        showDate,
+                        showTime,
                         style: const TextStyle(
                             fontFamily: 'Poppins',
                             color: Color.fromARGB(255, 205, 205, 205)),
+                      )),
+                  Positioned(
+                      top: size.width * .03,
+                      right: size.width * .07,
+                      child: Icon(
+                        (widget.expense.notSynchronized ?? true)
+                            ? Icons.sync_problem_rounded
+                            : Icons.cloud_sync_rounded,
+                        color: (widget.expense.notSynchronized ?? true)
+                            ? Colors.red
+                            : Colors.green,
                       )),
                 ],
               ),

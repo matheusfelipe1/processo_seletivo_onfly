@@ -1,0 +1,4 @@
+enum StateDatabase {
+  alreadyProcessing,
+  notProcessing,
+}

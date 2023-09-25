@@ -33,7 +33,7 @@ class _HomeViewState extends State<HomeView>
   List<Widget> listForAnimations = List.generate(10, (index) {
     return AnimationShimmer(
       isAnimating: true,
-      child: CardTaskWidget(expense: ExpenseModel()),
+      child: CardTaskWidget(expense: ExpenseModel(notSynchronized: false)),
     );
   });
 
@@ -123,25 +123,35 @@ class _HomeViewState extends State<HomeView>
               ),
               SizedBox(
                 height: size.maxHeight * .75,
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    Dio()
-                        .head(VariablesStatic.connection)
-                        .then((value) => controller.getAll(true))
-                        .catchError((onError) => controller.getAll());
-                  },
-                  child: Obx(
-                    () => SizedBox(child: (() {
-                      switch (controller.state.value) {
-                        case StateScreen.waiting:
-                          return ListView.builder(
-                              physics: const BouncingScrollPhysics(),
+                child: Obx(
+                  () => SizedBox(child: (() {
+                    switch (controller.state.value) {
+                      case StateScreen.waiting:
+                        return RefreshIndicator.adaptive(
+                          onRefresh: () async {
+                            Dio()
+                                .head(VariablesStatic.connection)
+                                .then((value) => controller.getAll(true))
+                                .catchError((onError) => controller.getAll());
+                          },
+                          child: ListView.builder(
+                              physics: const BouncingScrollPhysics(
+                                  parent: AlwaysScrollableScrollPhysics()),
                               itemCount: listForAnimations.length,
                               itemBuilder: (_, index) =>
-                                  listForAnimations[index]);
-                        case StateScreen.hasData:
-                          return ListView.builder(
-                              physics: const BouncingScrollPhysics(),
+                                  listForAnimations[index]),
+                        );
+                      case StateScreen.hasData:
+                        return RefreshIndicator.adaptive(
+                          onRefresh: () async {
+                            Dio()
+                                .head(VariablesStatic.connection)
+                                .then((value) => controller.getAll(true))
+                                .catchError((onError) => controller.getAll());
+                          },
+                          child: ListView.builder(
+                              physics: const BouncingScrollPhysics(
+                                  parent: AlwaysScrollableScrollPhysics()),
                               itemCount: controller.expensesList.length,
                               itemBuilder: (_, index) => (() {
                                     switch (index == 0 ||
@@ -206,20 +216,20 @@ class _HomeViewState extends State<HomeView>
                                           ),
                                         );
                                     }
-                                  }()));
+                                  }())),
+                        );
 
-                        default:
-                          return Center(
-                            child: Text(
-                              'Nobody expenses was founded',
-                              style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: size.minWidth * .05),
-                            ),
-                          );
-                      }
-                    })()),
-                  ),
+                      default:
+                        return Center(
+                          child: Text(
+                            'Nobody expenses was founded',
+                            style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: size.minWidth * .05),
+                          ),
+                        );
+                    }
+                  })()),
                 ),
               ),
             ],

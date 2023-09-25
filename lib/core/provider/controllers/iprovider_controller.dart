@@ -11,7 +11,7 @@ abstract class IProividerController  {
   void doAuthenticate();
 
   List<ExpenseModel> expenses = [];
-  List<ExpenseModel> expensesInternalDatabase = [];
+  // List<ExpenseModel> expensesInternalDatabase = [];
 
   final IProviderRepository provider= ProviderRepository();
 
@@ -32,4 +32,6 @@ abstract class IProividerController  {
   void dataProcessing(List<(ExpenseModel, StatusRequest, DatabaseEvent)> datas);
 
   void executeDataProcessingFromAlert();
+
+  void getListFromInternalDatabase();
 }

@@ -35,7 +35,7 @@ class ExpenseModel {
               latitude: json['latitude'],
               longitude: json['longitude'],
               updated: json['updated'],
-              notSynchronized: json['notSynchronized'],
+              notSynchronized: false,
             );
 
   Map get toJSON => {

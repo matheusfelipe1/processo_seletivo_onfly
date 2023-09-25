@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:processo_seletivo_onfly/core/provider/controllers/provider_controller.dart';
 import 'package:processo_seletivo_onfly/models/details/details_model.dart';
 import 'package:processo_seletivo_onfly/shared/animations/animation_loading.dart';
 import 'package:processo_seletivo_onfly/shared/extensions/app_extensions.dart';
@@ -128,7 +129,13 @@ class DetailsViewModel extends GetxController {
   void verifyHasInternt() async {
     if (id != null) {
       await Dio().head(VariablesStatic.connection).catchError((onError) {
-        InformNoIntenet.show();
+        final data = ProividerController()
+            .expenses
+            .where((element) => element.id == id)
+            .firstOrNull;
+        if (data != null) _onReceivedDatas(data);
+        if (Loading.isShowing) Loading.hide();
+        _model.current = data;
       });
     }
   }

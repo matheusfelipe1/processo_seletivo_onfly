@@ -9,6 +9,7 @@ import 'package:processo_seletivo_onfly/shared/enum/states_enum.dart';
 import 'package:processo_seletivo_onfly/shared/extensions/app_extensions.dart';
 
 import '../../../models/expense/expense_model.dart';
+import '../../../shared/enum/status_request.dart';
 import '../../../shared/static/endpoints.dart';
 import '../../../shared/static/variables_static.dart';
 import '../../../shared/utils/inform_no_internet.dart';
@@ -69,9 +70,11 @@ class HomeRepository implements IHomeRepository {
   Future<void> delete(String id, ExpenseModel expense) async {
     try {
       await dataSource.delete('${Endpoints.expense}/$id');
+      database.executeActions(DatabaseRemoved(), expense, StatusRequest.success);
     } catch (e) {
       debugPrint(e.toString());
-      database.executeActions(DatabaseRemoved(), expense);
+      expense.notSynchronized = true;
+      database.executeActions(DatabaseRemoved(), expense, StatusRequest.failure);
       InformNoIntenet.showMessageInternalDatabase2();
     } finally {
       notifyEvents?.call(ExpenseDelete(), id, expense);

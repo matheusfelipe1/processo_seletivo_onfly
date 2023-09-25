@@ -49,12 +49,15 @@ class ProviderRepository implements IProviderRepository {
       final list = data["items"];
       if (list is List) {
         if (list.isNotEmpty) {
-          list.sort((a, b) => b['expense_date'].toString().toDate.compareTo(a['expense_date'].toString().toDate));
+          list.sort((a, b) => b['expense_date']
+              .toString()
+              .toDate
+              .compareTo(a['expense_date'].toString().toDate));
           values = list
               .cast<Map<String, dynamic>>()
               .map(ExpenseModel.fromJSON)
               .toList();
-          CustomCachedManager.post(VariablesStatic.expenseList, values);
+          CustomCachedManager.put(VariablesStatic.expenseList, values);
         }
       }
     } catch (e) {
@@ -65,20 +68,32 @@ class ProviderRepository implements IProviderRepository {
   }
 
   @override
-  Future<List<(ExpenseModel, StatusRequest, DatabaseEvent)>> synchronize(List<(ExpenseModel, DatabaseEvent)> datas) async {
+  Future<List<(ExpenseModel, StatusRequest, DatabaseEvent)>> synchronize(
+      List<(ExpenseModel, DatabaseEvent)> datas) async {
     final List<(ExpenseModel, StatusRequest, DatabaseEvent)> list = [];
     try {
       for (var element in datas) {
         switch (element.$2.runtimeType) {
           case DatabaseAdded:
-            list.add((element.$1, await register(element.$1.toJSON), element.$2));
+            if (element.$1.notSynchronized == true) {
+              list.add(
+                  (element.$1, await register(element.$1.toJSON), element.$2));
+            }
             break;
           case DatabaseUpdate:
-            list.add((element.$1, await update(element.$1.id!, element.$1.toJSON), element.$2));
+            if (element.$1.notSynchronized == true) {
+              list.add((
+                element.$1,
+                await update(element.$1.id!, element.$1.toJSON),
+                element.$2
+              ));
+            }
             break;
           case DatabaseRemoved:
-            list.add((element.$1, await delete(element.$1.id!), element.$2));
-            break;
+            if (element.$1.notSynchronized == true) {
+              list.add((element.$1, await delete(element.$1.id!), element.$2));
+              break;
+            }
           default:
         }
       }
@@ -89,7 +104,7 @@ class ProviderRepository implements IProviderRepository {
       return list;
     }
   }
-  
+
   @override
   Future<StatusRequest> register(Map body) async {
     try {
@@ -98,7 +113,7 @@ class ProviderRepository implements IProviderRepository {
     } catch (e) {
       debugPrint(e.toString());
       return StatusRequest.failure;
-    } 
+    }
   }
 
   @override
@@ -109,12 +124,12 @@ class ProviderRepository implements IProviderRepository {
     } catch (e) {
       debugPrint(e.toString());
       return StatusRequest.failure;
-    } 
+    }
   }
-  
+
   @override
-  Future<StatusRequest> delete(String id) async{
-     try {
+  Future<StatusRequest> delete(String id) async {
+    try {
       await dataSource.delete('${Endpoints.expense}/$id');
       return StatusRequest.success;
     } catch (e) {

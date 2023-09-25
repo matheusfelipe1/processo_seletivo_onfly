@@ -6,6 +6,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 import '../../../models/expense/expense_model.dart';
+import '../../../shared/enum/state_database.dart';
+import '../../../shared/enum/status_request.dart';
 import '../../events/database_events.dart';
 
 class InternalDatabase {
@@ -19,6 +21,8 @@ class InternalDatabase {
 
   late String databasesPath;
   late String path;
+
+  StateDatabase status = StateDatabase.notProcessing;
 
   _onInit() async {
     databasesPath = await getDatabasesPath();
@@ -38,7 +42,7 @@ class InternalDatabase {
         onUpgrade: _onUpgrade,
         onOpen: _onOpen,
         onCreate: _onCreate,
-        version: 10);
+        version: 12);
   }
 
   _onConfigure(Database db) async {
@@ -92,6 +96,17 @@ class InternalDatabase {
     }
   }
 
+  Future<void> removeUniqueData(String query) async {
+    try {
+      final database = await this.database;
+      if (database.isOpen) {
+        await database.delete(VariablesStatic.expensesTable, where: 'idExpense = ?', whereArgs: [query]);
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
   Future<void> removeAllData() async {
     try {
       final database = await this.database;
@@ -132,7 +147,7 @@ class InternalDatabase {
   }
 
   Future<dynamic> executeActions<T>(DatabaseEvent event,
-      [ExpenseModel? query]) async {
+      [dynamic query, StatusRequest? statusRequest]) async {
     switch (event.runtimeType) {
       case DatabaseAdded when query.runtimeType == ExpenseModel:
         final Map<String, Object?> data = {
@@ -141,8 +156,26 @@ class InternalDatabase {
           'expense_date': query.expenseDate,
           'amount': query.amount,
           'typeEvent': 'DatabaseAdded',
+          'notSynchronized': query.notSynchronized == true ? 1 : 0
         };
         await insertData(data);
+        break;
+      case DatabaseAddedAll when query.runtimeType == List<ExpenseModel>:
+        final listData = await getAllData();
+        for (var item in query) {
+          final Map<String, Object?> data = {
+            'idExpense': item.id,
+            'description': item.description,
+            'expense_date': item.expenseDate,
+            'amount': item.amount,
+            'typeEvent': 'DatabaseAdded',
+            'notSynchronized': item.notSynchronized == true ? 1 : 0
+          };
+          if (status == StateDatabase.notProcessing && listData.isEmpty) {
+            await insertData(data);
+          }
+        }
+        status = StateDatabase.alreadyProcessing;
         break;
       case DatabaseUpdate when query.runtimeType == ExpenseModel:
         final Map<String, Object?> data = {
@@ -151,33 +184,42 @@ class InternalDatabase {
           'expense_date': query.expenseDate,
           'amount': query.amount,
           'typeEvent': 'DatabaseUpdate',
+          'notSynchronized': query.notSynchronized == true ? 1 : 0
         };
         await insertData(data);
         break;
-      case DatabaseRemoved when query.runtimeType == ExpenseModel:
+      case DatabaseRemoved when query.runtimeType == ExpenseModel && statusRequest == StatusRequest.failure:
         final Map<String, Object?> data = {
           'idExpense': query!.id,
           'description': query.description,
           'expense_date': query.expenseDate,
           'amount': query.amount,
           'typeEvent': 'DatabaseRemoved',
+          'notSynchronized': query.notSynchronized == true ? 1 : 0
         };
         await insertData(data);
         break;
-
+      case DatabaseRemoved when query.runtimeType == ExpenseModel && statusRequest == StatusRequest.success:
+        await removeUniqueData(query.id);
+        break;
       case DatabaseRemovedAll:
         await removeAllData();
+        status = StateDatabase.notProcessing;
         break;
       case DatabaseGetAll:
         List<(ExpenseModel, DatabaseEvent)> list = [];
         final listData = await getAllData();
         list = listData
             .cast<Map<String, dynamic>>()
-            .map((e) => (ExpenseModel(
-                amount: e['amount'],
-                description: e['description'],
-                expenseDate: e['expense_date'],
-                id: e['idExpense']), typeEvent(e['typeEvent']) ))
+            .map((e) => (
+                  ExpenseModel(
+                      amount: e['amount'],
+                      description: e['description'],
+                      expenseDate: e['expense_date'],
+                      notSynchronized: e['notSynchronized'] == 1 ? true : false,
+                      id: e['idExpense']),
+                  typeEvent(e['typeEvent'])
+                ))
             .toList();
         return list;
       default:

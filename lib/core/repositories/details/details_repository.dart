@@ -48,6 +48,7 @@ class DetailsRepository implements IDetailsRepository {
       final value = ExpenseModel(
           description: body['description'],
           expenseDate: body['expense_date'],
+          notSynchronized: true,
           amount: body['amount']);
       dispatchValue?.call((value, ExpenseAdded()));
       database.executeActions(DatabaseAdded(), value);
@@ -73,6 +74,7 @@ class DetailsRepository implements IDetailsRepository {
           id: id,
           description: body['description'],
           expenseDate: body['expense_date'],
+          notSynchronized: true,
           amount: body['amount']);
       dispatchValue?.call((value, ExpenseAdded()));
       database.executeActions(DatabaseUpdate(), value);
