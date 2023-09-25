@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:processo_seletivo_onfly/core/events/database_events.dart';
 import 'package:processo_seletivo_onfly/core/events/navigation_event.dart';
@@ -10,6 +7,7 @@ import 'package:processo_seletivo_onfly/shared/animations/animation_loading.dart
 import 'package:processo_seletivo_onfly/shared/enum/status_request.dart';
 import 'package:processo_seletivo_onfly/shared/extensions/app_extensions.dart';
 import 'package:processo_seletivo_onfly/shared/static/variables_static.dart';
+import 'package:processo_seletivo_onfly/shared/utils/inform_no_internet.dart';
 import 'package:processo_seletivo_onfly/shared/utils/internet_info.dart';
 
 import '../../../models/expense/expense_model.dart';
@@ -26,7 +24,6 @@ class ProividerController extends IProividerController {
     verifyHasInternetConnection();
     getALlInternalDatabase();
     InternetInfo.syncronizeDatas = executeDataProcessingFromAlert;
-    
   }
   factory ProividerController() => _instance;
 
@@ -43,6 +40,11 @@ class ProividerController extends IProividerController {
     switch (event.runtimeType) {
       case const (List<ExpenseModel>):
         expenses = event;
+        if (expensesInternalDatabase.isNotEmpty) {
+          for (var element in expensesInternalDatabase) {
+            expenses.addWhereFromDatabase(element);
+          }
+        }
         onDispatchExpenses?.call(expenses);
         break;
       case NavigationToHome:
@@ -83,11 +85,13 @@ class ProividerController extends IProividerController {
   void verifyHasInternetConnection() {
     stream.listen((event) async {
       await Dio().head(VariablesStatic.connection).then((value) async {
-        final datas = await database.executeActions(DatabaseGetAll()) as List<(ExpenseModel, DatabaseEvent)>;
+        final datas = await database.executeActions(DatabaseGetAll())
+            as List<(ExpenseModel, DatabaseEvent)>;
+        expensesInternalDatabase = datas.map((e) => e.$1).toList();
         switch (datas.isNotEmpty) {
           case true:
             for (var item in datas) {
-               onReceivedEvent(item.$1, ExpenseAddedFromDatabase());
+              onReceivedEvent(item.$1, ExpenseAddedFromDatabase());
             }
             InternetInfo.showHasIntent;
             break;
@@ -99,18 +103,23 @@ class ProividerController extends IProividerController {
       });
     });
   }
-  
+
   @override
   void getALlInternalDatabase() async {
     await database.initialize();
-    final datas = await database.executeActions(DatabaseGetAll()) as List<(ExpenseModel, DatabaseEvent)>;
+    final datas = await database.executeActions(DatabaseGetAll())
+        as List<(ExpenseModel, DatabaseEvent)>;
     final datasSyncronized = await provider.synchronize(datas);
     dataProcessing(datasSyncronized);
   }
 
   @override
-  void dataProcessing(List<(ExpenseModel, StatusRequest, DatabaseEvent)> datas) async {
+  void dataProcessing(
+      List<(ExpenseModel, StatusRequest, DatabaseEvent)> datas) async {
     await database.executeActions(DatabaseRemovedAll());
+    expensesInternalDatabase = [];
+    expenses = [];
+    expensesInternalDatabase = datas.map((e) => e.$1).toList();
     for (var element in datas) {
       switch (element.$2) {
         case StatusRequest.failure:
@@ -120,13 +129,22 @@ class ProividerController extends IProividerController {
       }
     }
   }
-  
+
   @override
   void executeDataProcessingFromAlert() async {
-    Loading.show();
-    final datas = await database.executeActions(DatabaseGetAll()) as List<(ExpenseModel, DatabaseEvent)>;
-    final datasSyncronized = await provider.synchronize(datas);
-    dataProcessing(datasSyncronized);
-    Loading.hide();
+    await Dio().head(VariablesStatic.connection).then((value) async {
+      Loading.show();
+      InternetInfo.removeSnackbar;
+      final datas = await database.executeActions(DatabaseGetAll())
+          as List<(ExpenseModel, DatabaseEvent)>;
+      expensesInternalDatabase = datas.map((e) => e.$1).toList();
+      final datasSyncronized = await provider.synchronize(datas);
+      dataProcessing(datasSyncronized);
+      await Future.delayed(const Duration(milliseconds: 700));
+      await provider.getAll();
+      Loading.hide();
+    }).catchError((onError) {
+      InformNoIntenet.showMessageInternalDatabase4();
+    });
   }
 }

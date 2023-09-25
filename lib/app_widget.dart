@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:processo_seletivo_onfly/core/provider/controllers/provider_controller.dart';
 import 'package:processo_seletivo_onfly/shared/routes/app_routes.dart';
-import 'package:processo_seletivo_onfly/shared/static/variables_static.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});

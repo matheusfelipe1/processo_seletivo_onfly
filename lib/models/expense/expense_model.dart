@@ -1,5 +1,3 @@
-import '../../shared/enum/card_enum.dart';
-
 class ExpenseModel {
   double? amount;
   String? collectionId;

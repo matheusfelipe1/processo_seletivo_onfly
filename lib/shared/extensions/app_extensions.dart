@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../../models/expense/expense_model.dart';
 
 extension CustomList<T> on List {
@@ -37,17 +39,22 @@ extension CustomData<T> on String {
 
 extension CustomDatas on List<ExpenseModel> {
   bool showDateHere(int index) {
-    final currentElement = this[index];
-    if (index == 0) return false;
-    final beforeElement = this[index - 1];
-    if (beforeElement.expenseDate
-            .toString()
-            .onlyDate
-            .toDate
-            .difference(currentElement.expenseDate.toString().onlyDate.toDate)
-            .inDays >
-        0) return true;
-    return false;
+    try {
+      final currentElement = this[index];
+      if (index == 0) return false;
+      final beforeElement = this[index - 1];
+      if (beforeElement.expenseDate
+              .toString()
+              .onlyDate
+              .toDate
+              .difference(currentElement.expenseDate.toString().onlyDate.toDate)
+              .inDays >
+          0) return true;
+      return false;
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
   }
 
   void addWhere(ExpenseModel item) {
@@ -66,19 +73,30 @@ extension CustomDatas on List<ExpenseModel> {
   }
 
   void addWhereFromDatabase(ExpenseModel item) {
-    if (!contains(item)) {
-      if (item.id != null) {
-        removeWhere((element) => element.id == item.id);
+    try {
+      for (var items in this) {
+        if (items.amount == item.amount &&
+            items.description == item.description &&
+            items.expenseDate == item.expenseDate) {
+          throw Error();
+        }
       }
-      final index = indexWhere((element) => item.expenseDate
-          .toString()
-          .toDate
-          .isAfter(element.expenseDate.toString().toDate));
-      if (index == -1) {
-        add(item);
-      } else {
-        insert(index, item);
+      if (!contains(item)) {
+        if (item.id != null) {
+          removeWhere((element) => element.id == item.id);
+        }
+        final index = indexWhere((element) => item.expenseDate
+            .toString()
+            .toDate
+            .isAfter(element.expenseDate.toString().toDate));
+        if (index == -1) {
+          add(item);
+        } else {
+          insert(index, item);
+        }
       }
+    } catch (e) {
+      debugPrint("Already has this element");
     }
   }
 }

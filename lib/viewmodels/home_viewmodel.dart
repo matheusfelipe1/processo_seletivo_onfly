@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:processo_seletivo_onfly/core/provider/controllers/provider_controller.dart';
 
 import '../models/expense/expense_model.dart';
@@ -11,6 +12,8 @@ class HomeViewModel extends GetxController {
 
   RxList<ExpenseModel> expensesList = <ExpenseModel>[].obs;
   Rx<StateScreen> state = StateScreen.waiting.obs;
+  RxString total = '0.0'.obs;
+  final format = NumberFormat.currency(locale: 'en_US', decimalDigits: 2, symbol: '\$ ');
 
   @override
   void onInit() {
@@ -24,7 +27,14 @@ class HomeViewModel extends GetxController {
   }
 
   void _onReceivedDatas(List<ExpenseModel> expenses) {
+    
     expensesList.value = expenses;
+    if (expenses.isNotEmpty) {
+      final totalCounted = expenses.map((e) => e.amount!).reduce((a, b) => a + b);
+      total.value = format.format(totalCounted);
+    } else {
+      total.value = format.format(0);
+    }
     _onNotifyState(
         expenses.isEmpty ? StateScreen.noHasData : StateScreen.hasData);
   }
@@ -49,5 +59,9 @@ class HomeViewModel extends GetxController {
 
   void getAll([bool force = false]) {
     _model.getAll(force);
+  }
+
+  void executeSync() {
+    provider.executeDataProcessingFromAlert();
   }
 }

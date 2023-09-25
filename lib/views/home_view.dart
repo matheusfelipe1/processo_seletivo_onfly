@@ -1,8 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/get_core.dart';
 import 'package:get/get_navigation/get_navigation.dart';
-import 'package:processo_seletivo_onfly/shared/enum/card_enum.dart';
 import 'package:processo_seletivo_onfly/shared/enum/states_enum.dart';
 import 'package:processo_seletivo_onfly/shared/extensions/app_extensions.dart';
 import 'package:processo_seletivo_onfly/shared/routes/app_paths.dart';
@@ -15,7 +15,6 @@ import '../models/expense/expense_model.dart';
 import '../shared/animations/animation_shimmer.dart';
 import '../shared/static/variables_static.dart';
 import '../shared/utils/inform_no_internet.dart';
-import '../shared/utils/internet_info.dart';
 import '../viewmodels/home_viewmodel.dart';
 
 class HomeView extends StatefulWidget {
@@ -66,40 +65,71 @@ class _HomeViewState extends State<HomeView>
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: size.minWidth * .1),
-                child: Image.asset(
-                  'assets/images/logo-01.webp',
-                  width: size.minWidth * .23,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Image.asset(
+                      'assets/images/logo-01.webp',
+                      width: size.minWidth * .23,
+                    ),
+                    Obx(() => Text(
+                          controller.total.value,
+                          style: TextStyle(
+                              fontFamily: 'Poppins-Bold',
+                              fontSize: size.minWidth * .06,
+                              fontStyle: FontStyle.italic),
+                        ))
+                  ],
                 ),
               ),
               Padding(
                 padding: EdgeInsets.all(size.maxWidth * .07),
-                child: Material(
-                  elevation: 10,
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(size.maxWidth * .1),
-                  child: TextFormField(
-                    controller: _text,
-                    onChanged: (text) => controller.onFiltering(text),
-                    onTapOutside: (detail) => FocusScope.of(context).unfocus(),
-                    cursorColor: AppColors.blue,
-                    style: const TextStyle(
-                        fontFamily: 'Poppins', color: Colors.black),
-                    decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: Colors.grey,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: size.maxWidth * .72,
+                      child: Material(
+                        elevation: 10,
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(size.maxWidth * .1),
+                        child: TextFormField(
+                          controller: _text,
+                          onChanged: (text) => controller.onFiltering(text),
+                          onTapOutside: (detail) =>
+                              FocusScope.of(context).unfocus(),
+                          cursorColor: AppColors.blue,
+                          style: const TextStyle(
+                              fontFamily: 'Poppins', color: Colors.black),
+                          decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              prefixIcon: Icon(
+                                Icons.search,
+                                color: Colors.grey,
+                              ),
+                              hintText: 'Type here',
+                              hintStyle: TextStyle(
+                                  fontFamily: 'Poppins', color: Colors.grey)),
                         ),
-                        hintText: 'Type here',
-                        hintStyle: TextStyle(
-                            fontFamily: 'Poppins', color: Colors.grey)),
-                  ),
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          controller.executeSync();
+                        },
+                        icon: const Icon(Icons.sync))
+                  ],
                 ),
               ),
               SizedBox(
                 height: size.maxHeight * .75,
                 child: RefreshIndicator(
-                  onRefresh: () async => controller.getAll(true),
+                  onRefresh: () async {
+                    Dio()
+                        .head(VariablesStatic.connection)
+                        .then((value) => controller.getAll(true))
+                        .catchError((onError) => controller.getAll());
+                  },
                   child: Obx(
                     () => SizedBox(child: (() {
                       switch (controller.state.value) {
@@ -181,7 +211,7 @@ class _HomeViewState extends State<HomeView>
                         default:
                           return Center(
                             child: Text(
-                              'Nobody task was founded',
+                              'Nobody expenses was founded',
                               style: TextStyle(
                                   fontFamily: 'Poppins',
                                   fontSize: size.minWidth * .05),

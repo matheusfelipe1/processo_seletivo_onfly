@@ -65,7 +65,7 @@ class _CardTaskWidgetState extends State<CardTaskWidget> {
     if (result == null) {
       setState(() {});
     } else {
-      widget.onDelete?.call(widget.expense.id!);
+      widget.onDelete?.call(widget.expense.id ?? '');
     }
   }
 

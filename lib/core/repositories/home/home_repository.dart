@@ -74,13 +74,13 @@ class HomeRepository implements IHomeRepository {
       database.executeActions(DatabaseRemoved(), expense);
       InformNoIntenet.showMessageInternalDatabase2();
     } finally {
-      notifyEvents?.call(ExpenseDelete(), id);
+      notifyEvents?.call(ExpenseDelete(), id, expense);
     }
     
   }
 
   @override
-  Function(ExpenseEvents p1, [String? id])? notifyEvents;
+  Function(ExpenseEvents p1, [String? id, ExpenseModel? model])? notifyEvents;
 
   @override
   Function(StateScreen newState)? stateScreen;

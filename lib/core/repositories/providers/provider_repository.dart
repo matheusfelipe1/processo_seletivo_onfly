@@ -5,7 +5,6 @@ import 'package:processo_seletivo_onfly/core/middleware/datasource.dart';
 import 'package:processo_seletivo_onfly/core/provider/cached/custom_cached.dart';
 import 'package:processo_seletivo_onfly/core/provider/databases/local_storage.dart';
 import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
-import 'package:processo_seletivo_onfly/shared/animations/animation_loading.dart';
 import 'package:processo_seletivo_onfly/shared/extensions/app_extensions.dart';
 import 'package:processo_seletivo_onfly/shared/static/endpoints.dart';
 import 'package:processo_seletivo_onfly/shared/static/variables_static.dart';
@@ -85,7 +84,7 @@ class ProviderRepository implements IProviderRepository {
       }
       await getAll();
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
     } finally {
       return list;
     }

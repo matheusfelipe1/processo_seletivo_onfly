@@ -20,7 +20,7 @@ class HomeExpenseModel {
 
   HomeExpenseModel({this.list, this.listCached}) {
     _repository.notifyEvents = _onNotifyEvent;
-    _repository.notifyExecutedAction =  _provider.onReceivedEvent;
+    _repository.notifyExecutedAction = _provider.onReceivedEvent;
     _repository.stateScreen = (p0) => stateScreen?.call(p0);
   }
 
@@ -52,12 +52,12 @@ class HomeExpenseModel {
     await _repository.delete(id, model);
   }
 
-  void _onNotifyEvent(ExpenseEvents event, [String? id]) {
+  void _onNotifyEvent(ExpenseEvents event, [String? id, ExpenseModel? model]) {
     switch (event.runtimeType) {
       case ExpenseDelete:
         final list = [...listCached!]
-          ..removeWhere((element) => element.id == id);
-          final element = this.list!.firstWhere((element) => element.id == id);
+          ..removeWhere((element) => element == model);
+        final element = model;
         onReceivedNewList = list;
         CustomCachedManager.put(VariablesStatic.expenseList, list);
         notifyList?.call(list);
@@ -69,6 +69,4 @@ class HomeExpenseModel {
   void getAll([bool force = false]) {
     _repository.getAll(force);
   }
-
-  
 }

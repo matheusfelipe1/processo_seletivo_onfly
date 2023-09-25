@@ -11,6 +11,7 @@ abstract class IProividerController  {
   void doAuthenticate();
 
   List<ExpenseModel> expenses = [];
+  List<ExpenseModel> expensesInternalDatabase = [];
 
   final IProviderRepository provider= ProviderRepository();
 

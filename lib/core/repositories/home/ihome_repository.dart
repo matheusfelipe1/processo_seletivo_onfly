@@ -11,7 +11,7 @@ abstract class IHomeRepository {
   Function(List<ExpenseModel>)? notifyExecutedAction;
   Future<void> getAll([bool force = false]);
   Future<void> delete(String id, ExpenseModel expense);
-  Function(ExpenseEvents, [String? id])? notifyEvents;
+  Function(ExpenseEvents, [String? id, ExpenseModel? model])? notifyEvents;
   Function(StateScreen newState)? stateScreen;
   final database = InternalDatabase.instance;
 }
