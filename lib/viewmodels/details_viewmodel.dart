@@ -10,7 +10,6 @@ import 'package:processo_seletivo_onfly/shared/static/variables_static.dart';
 
 import '../models/expense/expense_model.dart';
 import '../shared/enum/states_enum.dart';
-import '../shared/utils/inform_no_internet.dart';
 
 class DetailsViewModel extends GetxController {
   final _model = DetailsModel();

@@ -26,7 +26,7 @@ extension CustomData<T> on String {
 
   String get onlyDate {
     final listStrings = split('');
-    var index;
+    int index;
     if (contains('T')) {
       index = listStrings.indexOf('T');
     } else {

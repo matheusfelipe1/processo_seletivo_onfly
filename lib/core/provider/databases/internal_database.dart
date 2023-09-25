@@ -19,16 +19,15 @@ class InternalDatabase {
 
   static final InternalDatabase instance = InternalDatabase();
 
-  late String databasesPath;
-  late String path;
+  Future<String> get databasesPath async => await getDatabasesPath();
+  Future<String> get path async =>
+      join(await databasesPath, VariablesStatic.dbName);
 
   StateDatabase status = StateDatabase.notProcessing;
 
   _onInit() async {
-    databasesPath = await getDatabasesPath();
-    path = join(databasesPath, VariablesStatic.dbName);
     try {
-      await Directory(databasesPath).create(recursive: true);
+      await Directory(await databasesPath).create(recursive: true);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -37,7 +36,7 @@ class InternalDatabase {
   initialize() async => await _onInit();
 
   Future<Database> _getDatabase() async {
-    return await openDatabase(path,
+    return await openDatabase(await path,
         onConfigure: _onConfigure,
         onUpgrade: _onUpgrade,
         onOpen: _onOpen,
@@ -79,13 +78,14 @@ class InternalDatabase {
     }
   }
 
-  Future<Map<String, Object?>?> getUniqueData(String query) async {
+  Future<Map<String, Object?>?> getUniqueData(
+      String where, List<dynamic> queries) async {
     Map<String, Object?>? datas = {};
     try {
       final database = await this.database;
       if (database.isOpen) {
         datas = (await database.query(VariablesStatic.expensesTable,
-                where: 'idExpense = ?', whereArgs: [query]))
+                where: where, whereArgs: queries))
             .firstOrNull;
       }
     } catch (e) {
@@ -100,7 +100,8 @@ class InternalDatabase {
     try {
       final database = await this.database;
       if (database.isOpen) {
-        await database.delete(VariablesStatic.expensesTable, where: 'idExpense = ?', whereArgs: [query]);
+        await database.delete(VariablesStatic.expensesTable,
+            where: 'idExpense = ?', whereArgs: [query]);
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -122,7 +123,8 @@ class InternalDatabase {
     bool success = false;
     try {
       if (row['idExpense'] != null) {
-        final data = await getUniqueData(row['idExpense'] as String);
+        final data =
+            await getUniqueData('idExpense = ?', [row['idExpense'] as String]);
         if (data != null && data.isNotEmpty) {
           final database = await this.database;
           await database.update(VariablesStatic.expensesTable, row,
@@ -135,8 +137,25 @@ class InternalDatabase {
         }
       } else {
         final database = await this.database;
-        await database.insert(VariablesStatic.expensesTable, row);
-        success = true;
+        final data = await getUniqueData(
+            'description = ? AND expense_date = ? AND amount = ?', [
+          row['description'] as String,
+          row['expense_date'] as String,
+          row['amount'] as double
+        ]);
+        if (data != null && data.isNotEmpty) {
+          await database.update(VariablesStatic.expensesTable, row,
+              where: 'description = ? AND expense_date = ? AND amount = ?',
+              whereArgs: [
+                row['description'] as String,
+                row['expense_date'] as String,
+                row['amount'] as double
+              ]);
+          success = true;
+        } else {
+          await database.insert(VariablesStatic.expensesTable, row);
+          success = true;
+        }
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -188,7 +207,9 @@ class InternalDatabase {
         };
         await insertData(data);
         break;
-      case DatabaseRemoved when query.runtimeType == ExpenseModel && statusRequest == StatusRequest.failure:
+      case DatabaseRemoved
+          when query.runtimeType == ExpenseModel &&
+              statusRequest == StatusRequest.failure:
         final Map<String, Object?> data = {
           'idExpense': query!.id,
           'description': query.description,
@@ -199,7 +220,9 @@ class InternalDatabase {
         };
         await insertData(data);
         break;
-      case DatabaseRemoved when query.runtimeType == ExpenseModel && statusRequest == StatusRequest.success:
+      case DatabaseRemoved
+          when query.runtimeType == ExpenseModel &&
+              statusRequest == StatusRequest.success:
         await removeUniqueData(query.id);
         break;
       case DatabaseRemovedAll:

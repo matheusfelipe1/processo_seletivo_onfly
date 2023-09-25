@@ -1,8 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/get_core.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:processo_seletivo_onfly/shared/enum/states_enum.dart';
 import 'package:processo_seletivo_onfly/shared/extensions/app_extensions.dart';
 import 'package:processo_seletivo_onfly/shared/routes/app_paths.dart';
@@ -44,7 +42,9 @@ class _HomeViewState extends State<HomeView>
     controller = Get.put(HomeViewModel());
     controller.updateContext = () {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       });
     };
   }

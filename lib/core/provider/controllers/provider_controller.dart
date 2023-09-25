@@ -137,7 +137,6 @@ class ProividerController extends IProividerController {
       InternetInfo.removeSnackbar;
       final datas = await database.executeActions(DatabaseGetAll())
           as List<(ExpenseModel, DatabaseEvent)>;
-      // expensesInternalDatabase = datas.map((e) => e.$1).toList();
       final datasSyncronized = await provider.synchronize(datas);
       dataProcessing(datasSyncronized);
       await Future.delayed(const Duration(milliseconds: 700));
@@ -151,6 +150,7 @@ class ProividerController extends IProividerController {
 
   @override
   void getListFromInternalDatabase() async {
+    // ignore: body_might_complete_normally_catch_error
     await Dio().head(VariablesStatic.connection).catchError((onError) async {
       final list = await database.executeActions(DatabaseGetAll()) as List;
       if (expenses.isEmpty && list.isNotEmpty) {

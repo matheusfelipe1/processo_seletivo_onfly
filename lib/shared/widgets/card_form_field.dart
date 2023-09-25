@@ -14,6 +14,7 @@ class CardFormField extends StatefulWidget {
   final NumberFormat? format;
   final Icon? icon;
   final TextEditingController controller;
+  final FocusNode focus;
   CardFormField(
       {super.key,
       required this.title,
@@ -23,7 +24,7 @@ class CardFormField extends StatefulWidget {
       this.format,
       this.icon,
       required this.hint,
-      required this.controller});
+      required this.controller, required this.focus});
 
   @override
   State<CardFormField> createState() => _CardFormFieldState();
@@ -73,6 +74,10 @@ class _CardFormFieldState extends State<CardFormField> {
                 return null;
               },
               controller: widget.controller,
+                      focusNode: widget.focus,
+              onTap: () {
+                FocusScope.of(context).requestFocus();
+              },
               keyboardType: widget.mask != null || widget.format != null
                   ? TextInputType.number
                   : TextInputType.text,
