@@ -34,7 +34,7 @@ void main() {
   //   when(await mockDio.client.get(Endpoints.expense))
   //       .thenAnswer((Invocation data) => Response<dynamic>(body: data., statusCode: 200,));
   // });
-  testWidgets('Test Screen tet', (WidgetTester tester) async {
+  testWidgets('Test Home Screen', (WidgetTester tester) async {
     final mockObserver = MockNavigatorObserver();
     await tester.pumpWidget(GetMaterialApp(
       title: 'OnFly',
@@ -63,6 +63,11 @@ void main() {
     final textFormField = find.byType(TextFormField);
 
     expect(textFormField, findsOneWidget);
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nobody expenses was founded'), findsOneWidget);
+
 
     final floatingActionButton = find.byType(FloatingActionButton);
 

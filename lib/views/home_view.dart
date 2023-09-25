@@ -190,30 +190,40 @@ class _HomeViewState extends State<HomeView>
                                                         controller.expensesList[
                                                             index]),
                                               ),
-                                            )
+                                            ),
+                                            if (index == (controller
+                                                    .expensesList.length - 1))
+                                                    SizedBox(height: size.maxHeight * .07,)
                                           ],
                                         );
                                       default:
-                                        return InkWell(
-                                          onTap: () {
-                                            if (controller
-                                                    .expensesList[index].id ==
-                                                null) {
-                                              InformNoIntenet
-                                                  .showMessageInternalDatabase3();
-                                            } else {
-                                              Get.toNamed(AppPaths.details,
-                                                  arguments: controller
-                                                      .expensesList[index].id);
-                                            }
-                                          },
-                                          child: CardTaskWidget(
-                                            expense:
-                                                controller.expensesList[index],
-                                            onDelete: (id) => controller.delete(
-                                                id,
-                                                controller.expensesList[index]),
-                                          ),
+                                        return Column(
+                                          children: [
+                                            InkWell(
+                                              onTap: () {
+                                                if (controller
+                                                        .expensesList[index].id ==
+                                                    null) {
+                                                  InformNoIntenet
+                                                      .showMessageInternalDatabase3();
+                                                } else {
+                                                  Get.toNamed(AppPaths.details,
+                                                      arguments: controller
+                                                          .expensesList[index].id);
+                                                }
+                                              },
+                                              child: CardTaskWidget(
+                                                expense:
+                                                    controller.expensesList[index],
+                                                onDelete: (id) => controller.delete(
+                                                    id,
+                                                    controller.expensesList[index]),
+                                              ),
+                                            ),
+                                            if (index == (controller
+                                                    .expensesList.length - 1))
+                                                    SizedBox(height: size.maxHeight * .07,)
+                                          ],
                                         );
                                     }
                                   }())),

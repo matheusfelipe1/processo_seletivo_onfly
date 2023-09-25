@@ -51,11 +51,14 @@ class _CardFormFieldState extends State<CardFormField> {
               validator: (text) {
                 if (text == null) return 'This field cannot be empty';
                 if (text.isEmpty) return 'This field cannot be empty';
+                if (text.trim().isEmpty) return 'This field cannot be empty';
                 if (widget.type == TypeCardTextForm.amount) {
-                  final newText = text.replaceAll('\$ ', '');
+                  final newText = text.replaceAll('\$ ', '').replaceAll(',', '');
                   if (double.tryParse(newText) == 0.0) {
                     return 'Amount cannot be \$ 0.0';
-                  }
+                  } else if (double.tryParse(newText) == null) {
+                    return 'Invalid amount';
+                  } 
                 }
                 if (widget.type == TypeCardTextForm.time) {
                   final newText = text.replaceAll(':', '');

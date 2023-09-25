@@ -7,8 +7,14 @@ import '../../events/database_events.dart';
 import '../../events/expense_events.dart';
 
 abstract class IProividerController  {
+
+  IProividerController() {
+    onInit();
+  }
  
   void doAuthenticate();
+
+  void onInit();
 
   List<ExpenseModel> expenses = [];
   // List<ExpenseModel> expensesInternalDatabase = [];

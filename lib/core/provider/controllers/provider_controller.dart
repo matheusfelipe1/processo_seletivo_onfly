@@ -19,16 +19,20 @@ import '../databases/internal_database.dart';
 class ProividerController extends IProividerController {
   static final ProividerController _instance = ProividerController._();
   late Stream stream;
-  ProividerController._() {
+  ProividerController._();
+
+  factory ProividerController() => _instance;
+
+  final database = InternalDatabase.instance;
+
+  @override
+  void onInit() {
     doAuthenticate();
     startStream();
     verifyHasInternetConnection();
     getALlInternalDatabase();
     InternetInfo.syncronizeDatas = executeDataProcessingFromAlert;
   }
-  factory ProividerController() => _instance;
-
-  final database = InternalDatabase.instance;
 
   @override
   void doAuthenticate() async {
@@ -113,11 +117,11 @@ class ProividerController extends IProividerController {
     final datas = await database.executeActions(DatabaseGetAll())
         as List<(ExpenseModel, DatabaseEvent)>;
     final datasSyncronized = await provider.synchronize(datas);
-    dataProcessing(datasSyncronized);
+    await dataProcessing(datasSyncronized);
   }
 
   @override
-  void dataProcessing(
+  Future<void> dataProcessing(
       List<(ExpenseModel, StatusRequest, DatabaseEvent)> datas) async {
     expenses = [];
     for (var element in datas) {
@@ -126,6 +130,8 @@ class ProividerController extends IProividerController {
           await database.executeActions(element.$3, element.$1);
           break;
         default:
+          await database.executeActions(DatabaseUpdateSync(), element.$1);
+          break;
       }
     }
   }
@@ -156,14 +162,16 @@ class ProividerController extends IProividerController {
       if (expenses.isEmpty && list.isNotEmpty) {
         final datas = list.map((e) => e.$1).toList().cast<ExpenseModel>();
         Future.delayed(const Duration(milliseconds: 100), () {
-        expenses = datas;
-        expenses.sort((a, b) => b.expenseDate
-            .toString()
-            .toDate
-            .compareTo(a.expenseDate.toString().toDate));
-        onDispatchExpenses?.call(expenses);
+          expenses = datas;
+          expenses.sort((a, b) => b.expenseDate
+              .toString()
+              .toDate
+              .compareTo(a.expenseDate.toString().toDate));
+          onDispatchExpenses?.call(expenses);
         });
       }
     });
   }
+  
+  
 }

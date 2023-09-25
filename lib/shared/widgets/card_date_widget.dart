@@ -48,6 +48,12 @@ class _CardDateFieldState extends State<CardDateField> {
               child: IgnorePointer(
                 ignoring: true,
                 child: TextFormField(
+                  validator: (text) {
+                    if (text == null) return 'This field cannot be empty';
+                    if (text.trim().isEmpty) return 'This field cannot be empty';
+                    if (DateTime.tryParse((text).replaceAll('/', '-')) == null) return 'Invalid date';
+                    return null;
+                  },
                   onFieldSubmitted: (val) => FocusScope.of(context).nextFocus(),
                   keyboardType: TextInputType.datetime,
                   onTap: () => showDatePicker(

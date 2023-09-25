@@ -62,6 +62,7 @@ class HomeExpenseModel {
         CustomCachedManager.put(VariablesStatic.expenseList, list);
         notifyList?.call(list);
         _provider.onReceivedEvent(element, event);
+        break;
       default:
     }
   }

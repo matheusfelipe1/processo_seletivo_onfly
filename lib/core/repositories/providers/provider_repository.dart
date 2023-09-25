@@ -97,10 +97,10 @@ class ProviderRepository implements IProviderRepository {
           default:
         }
       }
-      await getAll();
     } catch (e) {
       debugPrint(e.toString());
     } finally {
+      getAll();
       return list;
     }
   }

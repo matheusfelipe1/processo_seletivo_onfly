@@ -245,6 +245,17 @@ class InternalDatabase {
                 ))
             .toList();
         return list;
+      case DatabaseUpdateSync when query.runtimeType == ExpenseModel:
+        final Map<String, Object?> data = {
+          'idExpense': null,
+          'description': query!.description,
+          'expense_date': query.expenseDate,
+          'amount': query.amount,
+          'typeEvent': query.runtimeType.toString(),
+          'notSynchronized': 0
+        };
+        await updateSync(data);
+        break;
       default:
     }
   }
@@ -257,6 +268,49 @@ class InternalDatabase {
         return DatabaseUpdate();
       default:
         return DatabaseAdded();
+    }
+  }
+
+  Future<bool> updateSync(Map<String, Object?> row) async {
+    bool success = false;
+    try {
+      if (row['idExpense'] != null) {
+        final data =
+            await getUniqueData('idExpense = ?', [row['idExpense'] as String]);
+        if (data != null && data.isNotEmpty) {
+          final database = await this.database;
+          await database.update(VariablesStatic.expensesTable, row,
+              where: 'idExpense = ?', whereArgs: [row['idExpense'] as String]);
+          success = true;
+        } else {
+          success = false;
+        }
+      } else {
+        final database = await this.database;
+        final data = await getUniqueData(
+            'description = ? AND expense_date = ? AND amount = ?', [
+          row['description'] as String,
+          row['expense_date'] as String,
+          row['amount'] as double
+        ]);
+        if (data != null && data.isNotEmpty) {
+          await database.update(VariablesStatic.expensesTable, row,
+              where: 'description = ? AND expense_date = ? AND amount = ?',
+              whereArgs: [
+                row['description'] as String,
+                row['expense_date'] as String,
+                row['amount'] as double
+              ]);
+          success = true;
+        } else {
+          success = false;
+        }
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    } finally {
+      // ignore: control_flow_in_finally
+      return success;
     }
   }
 }
