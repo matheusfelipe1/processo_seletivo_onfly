@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:mockito/mockito.dart';
@@ -7,7 +6,6 @@ import 'package:processo_seletivo_onfly/core/middleware/custom_http.dart';
 import 'package:processo_seletivo_onfly/core/provider/controllers/provider_controller.dart';
 import 'package:processo_seletivo_onfly/shared/routes/app_paths.dart';
 import 'package:processo_seletivo_onfly/shared/routes/app_routes.dart';
-import 'package:processo_seletivo_onfly/shared/static/endpoints.dart';
 import 'package:processo_seletivo_onfly/viewmodels/details_viewmodel.dart';
 import 'package:processo_seletivo_onfly/viewmodels/home_viewmodel.dart';
 
