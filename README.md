@@ -156,5 +156,28 @@
             break;
 >
 - I just need to fire the event for this class and then it will decide what to do with the data received, in this case it will decide whether to insert, update, remove or fetch the data from the internal database.
+> Cache
+- With this custom cached we place the expense list arrays in a static location, when searching the API first it will try to search the set, if there is data it will return from there.
+>
+    import 'package:processo_seletivo_onfly/models/expense/expense_model.dart';
+
+    class CustomCachedManager {
+      static Set<Map> datas = {};
+    
+      static Set get<T>(String key) {
+        return datas.where((element) => element['key'] == key).toSet();
+      }
+    
+      static void post(String key, List<ExpenseModel> list) {
+        datas.add({'key': key, 'data': list});
+      }
+    
+      static void put(String key, List<ExpenseModel> list) {
+        datas.removeWhere((element) => element['key'] == key);
+        datas.add({'key': key, 'data': list});
+      }
+    }
+>
+- We also count on the presence of Set, Set is nothing more than a set of elements that have duplicates, that is, if there is already a value within this static variable with this key, you can even try to add it but it will have no effect
 - 
 
