@@ -11,6 +11,7 @@
     Engine • revision d44b5a94c9
     Tools • Dart 3.0.0 • DevTools 2.23.1
 >
+- APK link [here](https://drive.google.com/file/d/1xMgd64vtm_QpW-gYbyfCyZBJsPSbXksZ/view?usp=sharing)
 - Was used MVVM (Model-View-ViewModel) architecture with Repository.
 - A state management plugin was used, this plugin is used to perform view updates without the need to call setState with each view interaction.
 - Was used a plugin called **sqflite** that is famous SQLite but for Flutter applications, this plugin is used to perform save data on internal database.
@@ -32,3 +33,15 @@
 - The implementations folder is the folder that contains our classes that extends abstract classes from repositories.
 - The middleware folder is the folder that contains our DIO setup for services, is there that we do interceptors.
 - The events folder is the folder that contains our events mapped in the app, for any action that MVVM dispatch and execute some business rule.
+- The database folder is where our internal storage management will be located.
+- The provider folder is where our data processing will be located, there will be communication between all parts of the application including our business rule ("frontend" business rule), of course, there is where we will send any type of data and it He will be responsible for knowing what he has to do with this data in addition to designating the app's flow.
+- With that, our architecture looked like this:
+>
+    - lib/
+        - core/
+            - events/
+            - middleware/
+            - provider/
+                - cached/
+
+>
