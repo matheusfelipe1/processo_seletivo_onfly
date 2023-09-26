@@ -8,7 +8,7 @@ import '../../provider/databases/local_storage.dart';
 abstract class IHomeRepository {
   final dataSource = DataSource();
   final localStorage = LocalStorage();
-  Function(List<ExpenseModel>)? notifyExecutedAction;
+  Function(List<ExpenseModel>, [ExpenseEvents? event])? notifyExecutedAction;
   Future<void> getAll([bool force = false]);
   Future<void> delete(String id, ExpenseModel expense);
   Function(ExpenseEvents, [String? id, ExpenseModel? model])? notifyEvents;

@@ -108,6 +108,19 @@ class InternalDatabase {
     }
   }
 
+  Future<void> removeUniqueDataOnlyDatabase(
+      String columns, List<dynamic> values) async {
+    try {
+      final database = await this.database;
+      if (database.isOpen) {
+        await database.delete(VariablesStatic.expensesTable,
+            where: columns, whereArgs: values);
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
   Future<void> removeAllData() async {
     try {
       final database = await this.database;
@@ -224,6 +237,13 @@ class InternalDatabase {
           when query.runtimeType == ExpenseModel &&
               statusRequest == StatusRequest.success:
         await removeUniqueData(query.id);
+        break;
+      case DatabaseRemovedDatabase
+          when query.runtimeType == ExpenseModel &&
+              statusRequest == StatusRequest.success:
+        await removeUniqueDataOnlyDatabase(
+            'description = ? AND expense_date = ? AND amount = ?',
+            [query.description, query.expenseDate, query.amount]);
         break;
       case DatabaseRemovedAll:
         await removeAllData();

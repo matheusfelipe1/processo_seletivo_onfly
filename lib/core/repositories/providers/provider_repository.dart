@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:processo_seletivo_onfly/core/events/database_events.dart';
+import 'package:processo_seletivo_onfly/core/events/expense_events.dart';
 import 'package:processo_seletivo_onfly/core/middleware/datasource.dart';
 import 'package:processo_seletivo_onfly/core/provider/cached/custom_cached.dart';
 import 'package:processo_seletivo_onfly/core/provider/databases/local_storage.dart';
@@ -39,10 +40,11 @@ class ProviderRepository implements IProviderRepository {
   LocalStorage get localStorage => LocalStorage();
 
   @override
-  Function(dynamic)? notifyExecutedAction;
+  Function(dynamic, [ExpenseEvents? events])? notifyExecutedAction;
 
   @override
   Future<void> getAll() async {
+    ExpenseEvents? event;
     List<ExpenseModel> values = [];
     try {
       final data = await dataSource.get(Endpoints.expense);
@@ -62,8 +64,9 @@ class ProviderRepository implements IProviderRepository {
       }
     } catch (e) {
       debugPrint(e.toString());
+      event = ExpenseErrorOnGet();
     } finally {
-      notifyExecutedAction?.call(values);
+      notifyExecutedAction?.call(values, event);
     }
   }
 

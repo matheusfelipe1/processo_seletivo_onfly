@@ -40,4 +40,6 @@ abstract class IProividerController  {
   void executeDataProcessingFromAlert();
 
   void getListFromInternalDatabase();
+
+  Future<List<ExpenseModel>> getExpenseListFromDatabase();
 }

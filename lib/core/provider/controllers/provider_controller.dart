@@ -41,9 +41,14 @@ class ProividerController extends IProividerController {
   }
 
   @override
-  onReceivedEvent(dynamic event, [ExpenseEvents? action]) {
+  onReceivedEvent(dynamic event, [ExpenseEvents? action]) async {
     switch (event.runtimeType) {
-      case const (List<ExpenseModel>):
+      case const (List<ExpenseModel>)
+          when ExpenseErrorOnGet == action.runtimeType:
+        expenses = await getExpenseListFromDatabase();
+        onDispatchExpenses?.call(expenses);
+        break;
+      case const (List<ExpenseModel>) when action == null:
         expenses = event;
         database.executeActions(DatabaseAddedAll(), expenses);
         onDispatchExpenses?.call(expenses);
@@ -144,9 +149,9 @@ class ProividerController extends IProividerController {
       final datas = await database.executeActions(DatabaseGetAll())
           as List<(ExpenseModel, DatabaseEvent)>;
       final datasSyncronized = await provider.synchronize(datas);
-      dataProcessing(datasSyncronized);
-      await Future.delayed(const Duration(milliseconds: 700));
       await database.executeActions(DatabaseRemovedAll());
+      await dataProcessing(datasSyncronized);
+      await Future.delayed(const Duration(milliseconds: 700));
       await provider.getAll();
       Loading.hide();
     }).catchError((onError) {
@@ -173,5 +178,10 @@ class ProividerController extends IProividerController {
     });
   }
   
-  
+  @override
+  Future<List<ExpenseModel>> getExpenseListFromDatabase() async {
+    final datas = await database.executeActions(DatabaseGetAll())
+          as List<(ExpenseModel, DatabaseEvent)>;
+    return datas.map((e) => e.$1).toList();
+  }
 }

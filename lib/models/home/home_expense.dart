@@ -54,9 +54,20 @@ class HomeExpenseModel {
 
   void _onNotifyEvent(ExpenseEvents event, [String? id, ExpenseModel? model]) {
     switch (event.runtimeType) {
-      case ExpenseDelete:
+      case ExpenseDelete when id!.isNotEmpty:
         final list = [...listCached!]
           ..removeWhere((element) => element == model);
+        final element = model;
+        onReceivedNewList = list;
+        CustomCachedManager.put(VariablesStatic.expenseList, list);
+        notifyList?.call(list);
+        _provider.onReceivedEvent(element, event);
+        break;
+      case ExpenseDeleteFromDatabase when id!.isEmpty:
+        final list = [...listCached!]
+          ..removeWhere((element) => element.amount == model!.amount && 
+            element.description == model.description && 
+            element.expenseDate == model.expenseDate );
         final element = model;
         onReceivedNewList = list;
         CustomCachedManager.put(VariablesStatic.expenseList, list);

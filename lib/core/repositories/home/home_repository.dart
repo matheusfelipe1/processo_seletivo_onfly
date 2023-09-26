@@ -18,7 +18,7 @@ import 'ihome_repository.dart';
 
 class HomeRepository implements IHomeRepository {
   @override
-  Function(List<ExpenseModel>)? notifyExecutedAction;
+  Function(List<ExpenseModel>, [ExpenseEvents? event])? notifyExecutedAction;
 
   @override
   DataSource get dataSource => DataSource();
@@ -54,13 +54,13 @@ class HomeRepository implements IHomeRepository {
           }
         }
       }
+      stateScreen?.call(StateScreen.hasData);
+      notifyExecutedAction?.call(values);
     } catch (e) {
       debugPrint(e.toString());
       stateScreen?.call(StateScreen.hasData);
-    } finally {
-      stateScreen?.call(StateScreen.hasData);
-      notifyExecutedAction?.call(values);
-    }
+      notifyExecutedAction?.call(values, ExpenseErrorOnGet());
+    } 
   }
 
   @override
@@ -68,16 +68,23 @@ class HomeRepository implements IHomeRepository {
 
   @override
   Future<void> delete(String id, ExpenseModel expense) async {
+    late ExpenseEvents event;
     try {
-      await dataSource.delete('${Endpoints.expense}/$id');
-      database.executeActions(DatabaseRemoved(), expense, StatusRequest.success);
+      if (id.isNotEmpty) {
+        event = ExpenseDelete();
+        await dataSource.delete('${Endpoints.expense}/$id');
+        database.executeActions(DatabaseRemoved(), expense, StatusRequest.success);
+      } else {
+        event = ExpenseDeleteFromDatabase();
+        database.executeActions(DatabaseRemovedDatabase(), expense, StatusRequest.success);
+      }
     } catch (e) {
       debugPrint(e.toString());
       expense.notSynchronized = true;
       database.executeActions(DatabaseRemoved(), expense, StatusRequest.failure);
       InformNoIntenet.showMessageInternalDatabase2();
     } finally {
-      notifyEvents?.call(ExpenseDelete(), id, expense);
+      notifyEvents?.call(event, id, expense);
     }
     
   }
