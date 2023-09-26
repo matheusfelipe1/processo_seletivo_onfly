@@ -65,6 +65,10 @@
 >
 ## About code
 
+> Action and Reaction
+- Applying one of Solyd's basic concepts, which is the Principle of Responsibility, in the classes I create I always separate a method that receives an action and a method that triggers a reaction. Therefore, although the code sometimes seems more verbose, this type of approach makes it more manageable, achieving better scalability and readability.
+- So most of my classes (Especially the abstract ones) have the methods:
+
 > Abstractions
 - I like to use abstract classes whenever I can or should, and this project was no different. I always use methods in abstractions to make certain automatic requests, in addition to applying the contract between them.
 - In most methods you will see:
@@ -92,4 +96,19 @@
 
 >
 - This makes the code more automated
+
+> Events
+- Events are another way to make the code more automated in addition to improving the scalability of the project as a whole, since I create events like this:
+>
+    abstract class DatabaseEvent {}
+    class DatabaseAdded extends DatabaseEvent {}
+    class DatabaseAddedAll extends DatabaseEvent {}
+    class DatabaseRemoved extends DatabaseEvent {}
+    class DatabaseRemovedDatabase extends DatabaseEvent {}
+    class DatabaseRemovedAll extends DatabaseEvent {}
+    class DatabaseUpdate extends DatabaseEvent {}
+    class DatabaseUpdateSync extends DatabaseEvent {}
+    class DatabaseGetAll extends DatabaseEvent {}
+>
+
 
