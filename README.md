@@ -63,3 +63,33 @@
             <views-of-application>
             
 >
+## About code
+
+> Abstractions
+- I like to use abstract classes whenever I can or should, and this project was no different. I always use methods in abstractions to make certain automatic requests, in addition to applying the contract between them.
+- In most methods you will see:
+>
+    abstract class IProividerController  {
+    
+      IProividerController() {
+        onInit();
+      }
+     
+      void doAuthenticate();
+    
+      void onInit();
+
+    class ProividerController extends IProividerController {
+    
+      @override
+      void onInit() {
+        doAuthenticate();
+        startStream();
+        verifyHasInternetConnection();
+        getALlInternalDatabase();
+        InternetInfo.syncronizeDatas = executeDataProcessingFromAlert;
+      }
+
+>
+- This makes the code more automated
+
