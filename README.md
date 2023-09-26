@@ -68,6 +68,34 @@
 > Action and Reaction
 - Applying one of Solyd's basic concepts, which is the Principle of Responsibility, in the classes I create I always separate a method that receives an action and a method that triggers a reaction. Therefore, although the code sometimes seems more verbose, this type of approach makes it more manageable, achieving better scalability and readability.
 - So most of my classes (Especially the abstract ones) have the methods:
+>
+      final IProviderRepository provider= ProviderRepository();
+
+      dynamic onReceivedEvent(dynamic event, [ExpenseEvents? action]);
+    
+      Function(List<ExpenseModel>)? onDispatchExpenses;
+>
+- Where we have onReceivedEvent that receives events or data and handles them
+- and onDispatchExpenses, which triggers events.
+- In practice it looks like this:
+>
+      @override
+      onReceivedEvent(dynamic event, [ExpenseEvents? action]) async {
+        switch (event.runtimeType) {
+          case const (List<ExpenseModel>)
+              when ExpenseErrorOnGet == action.runtimeType:
+            expenses = await getExpenseListFromDatabase();
+            onDispatchExpenses?.call(expenses);
+            break;
+          case const (List<ExpenseModel>) when action == null:
+            expenses = event;
+            database.executeActions(DatabaseAddedAll(), expenses);
+            onDispatchExpenses?.call(expenses);
+            if (expenses.isEmpty && event.isEmpty) {
+              getListFromInternalDatabase();
+            }
+            break;
+>
 
 > Abstractions
 - I like to use abstract classes whenever I can or should, and this project was no different. I always use methods in abstractions to make certain automatic requests, in addition to applying the contract between them.
@@ -110,5 +138,23 @@
     class DatabaseUpdateSync extends DatabaseEvent {}
     class DatabaseGetAll extends DatabaseEvent {}
 >
-
+- Once I create the receiver this way:
+>
+    Future<dynamic> executeActions<T>(DatabaseEvent event,
+      [dynamic query, StatusRequest? statusRequest]) async {
+        switch (event.runtimeType) {
+          case DatabaseAdded when query.runtimeType == ExpenseModel:
+            final Map<String, Object?> data = {
+              'idExpense': null,
+              'description': query!.description,
+              'expense_date': query.expenseDate,
+              'amount': query.amount,
+              'typeEvent': 'DatabaseAdded',
+              'notSynchronized': query.notSynchronized == true ? 1 : 0
+            };
+            await insertData(data);
+            break;
+>
+- I just need to fire the event for this class and then it will decide what to do with the data received, in this case it will decide whether to insert, update, remove or fetch the data from the internal database.
+- 
 
