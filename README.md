@@ -179,5 +179,37 @@
     }
 >
 - We also count on the presence of Set, Set is nothing more than a set of elements that have duplicates, that is, if there is already a value within this static variable with this key, you can even try to add it but it will have no effect
-- 
+
+> Memory
+- It's that thing, it's not enough for an application to have good aesthetics, to have a good objective but without having good operation/performance, one of the best ways to avoid poor performance is to check the current state of your device's memory in correlation with your application, In this application, although it has a non-complex purpose, I found it interesting to observe its state so that we could obtain the best possible performance, so I did:
+>
+    import 'package:flutter/material.dart';
+
+    class DetectMemoryLeaks extends WidgetsBindingObserver {
+      @override
+      void didHaveMemoryPressure() {
+        debugPrint('We had a memory leak');
+        super.didHaveMemoryPressure();
+      }
+      @override
+      void didChangeAppLifecycleState(AppLifecycleState state) {
+        // TODO: implement didChangeAppLifecycleState
+        super.didChangeAppLifecycleState(state);
+        debugPrint(state.toString());
+      }
+    }
+    
+    void main() async {
+      WidgetsFlutterBinding.ensureInitialized();
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitDown,
+        DeviceOrientation.portraitUp
+      ]);
+      final memory = DetectMemoryLeaks();
+      WidgetsBinding.instance.addObserver(memory);
+      await dotenv.load(fileName: '.env');
+      runApp(const AppWidget());
+    }
+
+>
 
