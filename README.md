@@ -35,6 +35,7 @@
 - The events folder is the folder that contains our events mapped in the app, for any action that MVVM dispatch and execute some business rule.
 - The database folder is where our internal storage management will be located.
 - The provider folder is where our data processing will be located, there will be communication between all parts of the application including our business rule ("frontend" business rule), of course, there is where we will send any type of data and it He will be responsible for knowing what he has to do with this data in addition to designating the app's flow.
+- I created a cached folder so that we can manipulate data that we already fetch from the API, and thus avoid making requests all the time in the backend, although in this application there is not as much need for cached, but if it were a more robust application or one that requires large amounts of data processing, data, the use of cached manager is essential
 - With that, our architecture looked like this:
 >
     - lib/
@@ -43,5 +44,22 @@
             - middleware/
             - provider/
                 - cached/
-
+                - controllers/
+                - databases/
+            - repositories/
+        - models/
+            <models-of-applications>
+        - shared/
+            - animations/
+            - enums/
+            - extensions/
+            - routes/
+            - static/
+            - utils/
+            - widgets/
+        - viewmodels/
+            <viewModels-of-application>
+        - views/
+            <views-of-application>
+            
 >
