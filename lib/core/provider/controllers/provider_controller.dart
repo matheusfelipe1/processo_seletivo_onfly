@@ -177,11 +177,16 @@ class ProividerController extends IProividerController {
       }
     });
   }
-  
+
   @override
   Future<List<ExpenseModel>> getExpenseListFromDatabase() async {
     final datas = await database.executeActions(DatabaseGetAll())
-          as List<(ExpenseModel, DatabaseEvent)>;
-    return datas.map((e) => e.$1).toList();
+        as List<(ExpenseModel, DatabaseEvent)>;
+    return datas.map((e) => e.$1).toList()
+      ..sort((a, b) => b.expenseDate
+          .toString()
+          .toDate
+          .compareTo(a.expenseDate.toString().toDate));
+    
   }
 }
