@@ -63,6 +63,13 @@ class ProividerController extends IProividerController {
         expenses.removeWhere((element) => element.id == event.id);
         onDispatchExpenses?.call(expenses);
         break;
+      case ExpenseModel when ExpenseDeleteFromDatabase == action.runtimeType:
+        expenses.removeWhere((element) =>
+            element.description == event.description &&
+            element.expenseDate == event.expenseDate &&
+            element.amount == event.amount);
+        onDispatchExpenses?.call(expenses);
+        break;
       case ExpenseModel when ExpenseAdded == action.runtimeType:
         expenses.addWhere(event);
         onDispatchExpenses?.call(expenses);
@@ -187,6 +194,5 @@ class ProividerController extends IProividerController {
           .toString()
           .toDate
           .compareTo(a.expenseDate.toString().toDate));
-    
   }
 }
